@@ -1,6 +1,7 @@
 package com.hana.bankai.domain.account.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.hana.bankai.domain.product.entity.Product;
 import com.hana.bankai.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,9 +28,10 @@ public class Account {
     @GenericGenerator(name = "acc-code-generator", strategy = "com.hana.bankai.domain.account.entity.AccCodeGenerator")
     private String accCode;
 
-    @Column
-    @NotNull
-    private Long prodCode;
+    @ManyToOne
+    @JoinColumn(name = "prod_code")
+    @JsonBackReference
+    private Product product;
 
     @ManyToOne
     @JoinColumn(name = "user_code")
