@@ -1,6 +1,6 @@
 ---
 name: issue template(feature)
-about: refactor 이슈 템플릿
+about: feature 이슈 템플릿
 title: "[Feature]"
 labels: enhancement
 assignees: ''
