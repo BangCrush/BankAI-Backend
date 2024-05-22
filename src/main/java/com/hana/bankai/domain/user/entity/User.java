@@ -1,5 +1,7 @@
 package com.hana.bankai.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.hana.bankai.domain.account.entity.Account;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -9,7 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "user") // entity 이름 정의
 @Table(name = "user") // Database에 생성될 table의 이름 지정
@@ -69,9 +71,13 @@ public class User {
 
     @ColumnDefault("1000000")
     @Builder.Default()
+    @Column
     private Long userTrsfLimit = 1000000L;
 
     @Column
     private String userMainAcc;
 
+    @OneToMany(mappedBy = "user") // One(user) to Many(account)
+    @JsonManagedReference // 순환 참조 해결
+    private final List<Account> accountList = new ArrayList<>();
 }
