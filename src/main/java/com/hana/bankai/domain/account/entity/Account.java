@@ -1,6 +1,8 @@
 package com.hana.bankai.domain.account.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.hana.bankai.domain.autotransfer.entity.AutoTransfer;
 import com.hana.bankai.domain.product.entity.Product;
 import com.hana.bankai.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -12,6 +14,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "account") // entity 이름 정의
 @Table(name = "account") // Database에 생성될 table의 이름 지정
@@ -64,4 +68,7 @@ public class Account {
     @Builder.Default()
     private AccStatus status = AccStatus.valueOf("ACTIVE");
 
+    @OneToMany(mappedBy = "account") // One(account) to Many(autotransfer)
+    @JsonManagedReference // 순환 참조 해결
+    private final List<AutoTransfer> autoTransferList = new ArrayList<>();
 }
