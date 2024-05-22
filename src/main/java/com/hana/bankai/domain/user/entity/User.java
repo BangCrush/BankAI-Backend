@@ -80,4 +80,7 @@ public class User {
     @OneToMany(mappedBy = "user") // One(user) to Many(account)
     @JsonManagedReference // 순환 참조 해결
     private final List<Account> accountList = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user") // cf."user_job"이 아니라 "user"
+    private UserJob userJob;
 }
