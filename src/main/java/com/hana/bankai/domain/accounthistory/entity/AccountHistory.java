@@ -1,6 +1,6 @@
 package com.hana.bankai.domain.accounthistory.entity;
 
-import com.hana.bankai.global.common.enums.BankCode;
+import com.hana.bankai.global.common.enumtype.BankCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
