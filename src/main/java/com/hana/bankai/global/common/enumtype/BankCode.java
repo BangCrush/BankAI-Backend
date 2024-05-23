@@ -1,4 +1,4 @@
-package com.hana.bankai.global.common.enums;
+package com.hana.bankai.global.common.enumtype;
 
 import lombok.Getter;
 
@@ -12,9 +12,10 @@ public enum BankCode {
     C06("국민"),
     C11("농협"),
     C04("뱅크시");
-    private final String name;
 
-    BankCode(String name) {
-        this.name = name;
+    private final String desc;
+
+    BankCode(String desc) {
+        this.desc = desc;
     }
 }
