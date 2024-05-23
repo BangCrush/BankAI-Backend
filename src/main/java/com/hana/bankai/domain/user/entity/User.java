@@ -29,7 +29,7 @@ public class User {
     @Column(columnDefinition = "BINARY(16)")
     private UUID userCode;
 
-    @Column
+    @Column(unique = true)
     @NotNull
     private String userId;
 
@@ -41,7 +41,7 @@ public class User {
     @NotNull
     private String userName;
 
-    @Column(updatable = false)
+    @Column(updatable = false, unique = true)
     @NotNull
     private String userInherentNumber;
 
@@ -65,7 +65,7 @@ public class User {
     @Column(updatable = false) // 컬럼 수정 불가
     private LocalDate userCreatedAt;
 
-    @Column
+    @Column(unique = true)
     @NotNull
     private String userEmail;
 
