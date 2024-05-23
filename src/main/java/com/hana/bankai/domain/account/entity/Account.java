@@ -2,6 +2,7 @@ package com.hana.bankai.domain.account.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.hana.bankai.domain.account.enumtype.AccStatus;
 import com.hana.bankai.domain.autotransfer.entity.AutoTransfer;
 import com.hana.bankai.domain.product.entity.Product;
 import com.hana.bankai.domain.user.entity.User;

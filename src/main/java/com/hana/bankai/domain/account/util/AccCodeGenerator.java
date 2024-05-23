@@ -1,4 +1,4 @@
-package com.hana.bankai.domain.account.entity;
+package com.hana.bankai.domain.account.util;
 
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
