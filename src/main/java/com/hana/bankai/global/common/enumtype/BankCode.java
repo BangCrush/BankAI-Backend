@@ -1,7 +1,8 @@
-package com.hana.bankai.global.common.enums;
+package com.hana.bankai.global.common.enumtype;
 
 import lombok.Getter;
 
+// 은행 코드
 @Getter
 public enum BankCode {
     C88("신한"),

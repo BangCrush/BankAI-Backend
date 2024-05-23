@@ -2,6 +2,9 @@ package com.hana.bankai.domain.product.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.hana.bankai.domain.account.entity.Account;
+import com.hana.bankai.domain.product.enumtype.ProdAcc;
+import com.hana.bankai.domain.product.enumtype.ProdRepay;
+import com.hana.bankai.domain.product.enumtype.ProdType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
