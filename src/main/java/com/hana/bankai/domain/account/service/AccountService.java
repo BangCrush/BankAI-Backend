@@ -5,7 +5,6 @@ import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccStatus;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
-import com.hana.bankai.domain.user.entity.User;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,7 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_BALANCE_CHECK_SUCCESS, new AccountResponseDto.GetBalance(balance));
     }
 
-    public ApiResponse<AccountResponseDto.searchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
+    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
         Account account = accountRepository.findById(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
 
@@ -41,7 +40,16 @@ public class AccountService {
         }
 
         String userName = account.getUser().getUserName();
-        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.searchAcc(request.getAccCode(), userName));
+        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
+    }
+
+    public ApiResponse<AccountResponseDto.CheckRes> checkTransferLimit(AccountRequestDto.CheckTransferLimit request) {
+        Long balance = accountRepository.findAccBalanceByAccCode(request.getAccCode())
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+
+        boolean isTransferAble = balance >= request.getAmount();
+
+        return ApiResponse.success(ACCOUNT_LIMIT_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isTransferAble));
     }
 }
 

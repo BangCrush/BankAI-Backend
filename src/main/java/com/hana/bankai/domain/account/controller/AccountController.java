@@ -6,10 +6,7 @@ import com.hana.bankai.domain.account.service.AccountService;
 import com.hana.bankai.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +23,13 @@ public class AccountController {
 
     @Operation(summary = "계좌 검색")
     @GetMapping("/search")
-    public ApiResponse<AccountResponseDto.searchAcc> searchAcc(@RequestBody AccountRequestDto.AccCodeReq request) {
+    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(@RequestBody AccountRequestDto.AccCodeReq request) {
         return accountService.searchAcc(request);
+    }
+
+    @Operation(summary = "이체한도 체크")
+    @PostMapping("/check-limit")
+    public ApiResponse<AccountResponseDto.CheckRes> checkTransferLimit(@RequestBody AccountRequestDto.CheckTransferLimit request) {
+        return accountService.checkTransferLimit(request);
     }
 }

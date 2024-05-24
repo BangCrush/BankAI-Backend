@@ -11,4 +11,11 @@ public class AccountRequestDto {
     public static class AccCodeReq {
         private String accCode;
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class CheckTransferLimit {
+        private String accCode;
+        private Long amount;
+    }
 }
