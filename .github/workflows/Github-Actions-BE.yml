@@ -3,13 +3,9 @@ run-name: ${{ github.actor }}'s code is Deploying❕❗🚀
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-    types: [closed]
 
 jobs:
   deploy:
-    if: (github.event_name == 'pull_request' && github.event.action == 'closed') || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Get Github Actions IP
