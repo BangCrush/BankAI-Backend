@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity(name = "account_history") // entity 이름 정의
 @Table(name = "account_history") // Database에 생성될 table의 이름 지정
@@ -28,7 +29,7 @@ public class AccountHistory {
 
     @CreatedDate
     @Column(updatable = false) // 컬럼 수정 불가
-    private LocalDate hisDate;
+    private LocalDateTime hisDateTime;
 
     @Column
     @NotNull
