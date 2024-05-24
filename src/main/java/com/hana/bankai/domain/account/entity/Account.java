@@ -44,7 +44,7 @@ public class Account {
 
     @Column
     @NotNull
-    private int accTime;
+    private LocalDate accTime;
 
     @Column
     @ColumnDefault("0")
