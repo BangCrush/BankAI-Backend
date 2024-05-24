@@ -62,7 +62,7 @@ public class Account {
 
     @Column
     @NotNull
-    private String accPw;
+    private String accPwd;
 
     @Column
     @Builder.Default()

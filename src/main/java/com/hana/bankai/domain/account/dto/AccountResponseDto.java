@@ -17,8 +17,15 @@ public class AccountResponseDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class searchAcc {
+    public static class SearchAcc {
         private String accCode;
         private String userName;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class CheckRes {
+        private Boolean check;
     }
 }

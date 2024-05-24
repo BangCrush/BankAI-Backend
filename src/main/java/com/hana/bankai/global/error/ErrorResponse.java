@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 @Builder
 public class ErrorResponse {
     private final int status;
+    private final String code;
     private final String message;
 
     public static ResponseEntity<ErrorResponse> toResponseEntity(ErrorCode errorCode) {
@@ -16,6 +17,7 @@ public class ErrorResponse {
                 .status(HttpStatus.ACCEPTED)
                 .body(ErrorResponse.builder()
                         .status(202)
+                        .code(errorCode.getCode())
                         .message(errorCode.getMessage())
                         .build()
                 );
