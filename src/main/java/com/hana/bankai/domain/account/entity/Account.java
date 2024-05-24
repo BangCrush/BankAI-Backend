@@ -44,7 +44,7 @@ public class Account {
 
     @Column
     @NotNull
-    private int accTime;
+    private LocalDate accTime;
 
     @Column
     @ColumnDefault("0")
@@ -62,7 +62,7 @@ public class Account {
 
     @Column
     @NotNull
-    private String accPw;
+    private String accPwd;
 
     @Column
     @Builder.Default()
