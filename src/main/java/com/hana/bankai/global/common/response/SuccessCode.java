@@ -14,7 +14,8 @@ public enum SuccessCode {
     USER_LOGIN_SUCCESS(OK, "로그인 성공"),
 
     // Account
-    ACCOUNT_BALANCE_CHECK_SUCCESS(OK, "계좌 잔액 조회 성공")
+    ACCOUNT_BALANCE_CHECK_SUCCESS(OK, "계좌 잔액 조회 성공"),
+    ACCOUNT_SEARCH_SUCCESS(OK, "계좌 조회 성공")
     ;
 
     private final HttpStatus httpStatus;

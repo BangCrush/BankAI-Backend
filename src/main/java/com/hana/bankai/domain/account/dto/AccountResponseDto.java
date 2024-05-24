@@ -13,4 +13,12 @@ public class AccountResponseDto {
     public static class GetBalance {
         private Long accBalance;
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class searchAcc {
+        private String accCode;
+        private String userName;
+    }
 }
