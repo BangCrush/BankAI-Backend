@@ -8,7 +8,7 @@ public class AccountRequestDto {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class GetBalance {
+    public static class AccCodeReq {
         private String accCode;
     }
 }

@@ -20,7 +20,13 @@ public class AccountController {
 
     @Operation(summary = "계좌 잔액 조회")
     @GetMapping("/balance")
-    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestBody AccountRequestDto.GetBalance request) {
+    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestBody AccountRequestDto.AccCodeReq request) {
         return accountService.getBalance(request);
+    }
+
+    @Operation(summary = "계좌 검색")
+    @GetMapping("/search")
+    public ApiResponse<AccountResponseDto.searchAcc> searchAcc(@RequestBody AccountRequestDto.AccCodeReq request) {
+        return accountService.searchAcc(request);
     }
 }

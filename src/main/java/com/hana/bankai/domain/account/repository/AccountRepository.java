@@ -1,6 +1,7 @@
 package com.hana.bankai.domain.account.repository;
 
 import com.hana.bankai.domain.account.entity.Account;
+import com.hana.bankai.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, String> {
-    @Query("SELECT a.accBalance FROM account a WHERE a.accCode = :accCode")
+    @Query("select a.accBalance from account a where a.accCode = :accCode")
     Optional<Long> findAccBalanceByAccCode(@Param("accCode") String accCode);
 }
