@@ -18,4 +18,11 @@ public class AccountRequestDto {
         private String accCode;
         private Long amount;
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class CheckAccPwd {
+        private String accCode;
+        private String accPwd;
+    }
 }

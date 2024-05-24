@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("select a.accBalance from account a where a.accCode = :accCode")
     Optional<Long> findAccBalanceByAccCode(@Param("accCode") String accCode);
+
+    @Query("select a.accPwd from account a where a.accCode = :accCode")
+    Optional<String> findAccPwdByAccCode(@Param("accCode") String accCode);
 }

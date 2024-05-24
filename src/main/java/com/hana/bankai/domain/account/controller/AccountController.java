@@ -32,4 +32,10 @@ public class AccountController {
     public ApiResponse<AccountResponseDto.CheckRes> checkTransferLimit(@RequestBody AccountRequestDto.CheckTransferLimit request) {
         return accountService.checkTransferLimit(request);
     }
+
+    @Operation(summary = "계좌 비밀번호 체크")
+    @PostMapping("/check-pw")
+    public ApiResponse<AccountResponseDto.CheckRes> checkAccPwd(@RequestBody AccountRequestDto.CheckAccPwd request) {
+        return accountService.checkAccPw(request);
+    }
 }

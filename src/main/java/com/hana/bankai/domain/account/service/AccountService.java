@@ -51,5 +51,13 @@ public class AccountService {
 
         return ApiResponse.success(ACCOUNT_LIMIT_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isTransferAble));
     }
+
+    public ApiResponse<AccountResponseDto.CheckRes> checkAccPw(AccountRequestDto.CheckAccPwd request) {
+        String accPwd = accountRepository.findAccPwdByAccCode(request.getAccCode())
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+
+        boolean isPwdValid = accPwd.equals(request.getAccPwd());
+        return ApiResponse.success(ACCOUNT_PWD_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isPwdValid));
+    }
 }
 
