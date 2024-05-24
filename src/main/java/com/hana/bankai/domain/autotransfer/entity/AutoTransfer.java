@@ -1,7 +1,7 @@
 package com.hana.bankai.domain.autotransfer.entity;
 
 import com.hana.bankai.domain.account.entity.Account;
-import com.hana.bankai.global.common.enums.BankCode;
+import com.hana.bankai.global.common.enumtype.BankCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
