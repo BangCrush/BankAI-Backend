@@ -1,7 +1,5 @@
 package com.hana.bankai.domain.user.controller;
 
-import com.hana.bankai.domain.account.dto.AccountRequestDto;
-import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.user.dto.RefreshToken;
 import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
@@ -10,14 +8,11 @@ import com.hana.bankai.domain.user.service.UserService;
 import com.hana.bankai.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.Optional;
 
 @RestController
-//@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 

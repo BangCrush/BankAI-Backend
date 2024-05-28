@@ -57,14 +57,14 @@ public class UserResponseDto {
     }
 
     // !! 임시 코드. 추후 삭제 예정
-//    @Builder
-//    @Getter
-//    @AllArgsConstructor
-//    public static class TokenInfo {
-//        private String grantType;
-//        private String accessToken;
-//        private String refreshToken;
-//        private Long refreshTokenExpirationTime;
-//    }
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class TokenInfo {
+        private String grantType;
+        private String accessToken;
+        private String refreshToken;
+        private Long refreshTokenExpirationTime;
+    }
 
 }
