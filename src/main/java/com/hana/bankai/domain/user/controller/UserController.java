@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.Optional;
 
 @RestController
@@ -37,6 +38,18 @@ public class UserController {
     @PostMapping("/register/check")
     public ApiResponse<UserResponseDto.RegisterCheck> registerCheck(@RequestBody UserRequestDto.RegisterCheck request) {
         return userService.registerCheck(request);
+    }
+
+    @Operation(summary = "이메일 중복 여부 확인")
+    @PostMapping("/register/check-email")
+    public ApiResponse<UserResponseDto.RegisterCheckEmail> registerCheckEmail(@RequestBody UserRequestDto.RegisterCheckEmail request) {
+        return userService.registerCheckEmail(request);
+    }
+
+    @Operation(summary = "아이디 중복 여부 확인")
+    @PostMapping("/register/check-id")
+    public ApiResponse<UserResponseDto.RegisterCheckId> registerCheckId(@RequestBody UserRequestDto.RegisterCheckId request) {
+        return userService.registerCheckId(request);
     }
 
 }

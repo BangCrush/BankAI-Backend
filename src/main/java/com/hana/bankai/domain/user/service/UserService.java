@@ -28,8 +28,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import static com.hana.bankai.global.common.response.SuccessCode.ACCOUNT_SEARCH_SUCCESS;
-import static com.hana.bankai.global.common.response.SuccessCode.USER_REGISTER_CHECK_SUCCESS;
+import static com.hana.bankai.global.common.response.SuccessCode.*;
 import static com.hana.bankai.global.error.ErrorCode.*;
 
 @Slf4j
@@ -48,7 +47,7 @@ public class UserService {
     private final RedisTemplate redisTemplate;
 
 
-    // ex. 소윤 예시 코드
+    // ex. 소연 예시 코드
     public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
         Account account = accountRepository.findById(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
@@ -73,6 +72,30 @@ public class UserService {
         }
 
         return ApiResponse.success(USER_REGISTER_CHECK_SUCCESS, new UserResponseDto.RegisterCheck(value));
+    }
+
+    // 중복 이메일 여부 확인
+    public ApiResponse<UserResponseDto.RegisterCheckEmail> registerCheckEmail(UserRequestDto.RegisterCheckEmail request) {
+        // 중복이면 true, 아니면 false 반환
+        Boolean value = false;
+
+        if (userRepository.existsByUserEmail(request.getUserEmail())) {
+            value = true;
+        }
+
+        return ApiResponse.success(USER_REGISTER_CHECK_EMAIL_SUCCESS, new UserResponseDto.RegisterCheckEmail(value));
+    }
+
+    // 중복 아이디 여부 확인
+    public ApiResponse<UserResponseDto.RegisterCheckId> registerCheckId(UserRequestDto.RegisterCheckId request) {
+        // 중복이면 true, 아니면 false 반환
+        Boolean value = false;
+
+        if (userRepository.existsByUserId(request.getUserId())) {
+            value = true;
+        }
+
+        return ApiResponse.success(USER_REGISTER_CHECK_ID_SUCCESS, new UserResponseDto.RegisterCheckId(value));
     }
 
     /* Redis 관련 jwt 코드
