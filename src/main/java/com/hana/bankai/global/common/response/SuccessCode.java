@@ -18,7 +18,10 @@ public enum SuccessCode {
     ACCOUNT_SEARCH_SUCCESS(OK, "계좌 조회 성공"),
     ACCOUNT_LIMIT_CHECK_SUCCESS(OK, "이체한도 확인"),
     ACCOUNT_PWD_CHECK_SUCCESS(OK, "계좌 비밀번호 확인")
-    ;
+    ,
+
+    // Product
+    PRODUCT_SEARCH_SUCCESS(OK, "상품 조회 성공");
 
     private final HttpStatus httpStatus;
     private final String message;

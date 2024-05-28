@@ -25,7 +25,7 @@ public class Product {
 
     @Column
     @NotNull
-    private ProdType prodType;
+    private String prodType;
 
     @Column
     @NotNull
@@ -65,6 +65,7 @@ public class Product {
 
     @Column
     @NotNull
+    @Enumerated(EnumType.STRING)
     private ProdRepay prodRepay;
 
     @Column
@@ -73,6 +74,7 @@ public class Product {
 
     @Column
     @NotNull
+    @Enumerated(EnumType.STRING)
     private ProdAcc prodAcc;
 
     @Column
