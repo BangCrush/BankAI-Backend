@@ -38,4 +38,10 @@ public class AccountController {
     public ApiResponse<AccountResponseDto.CheckRes> checkAccPwd(@RequestBody AccountRequestDto.CheckAccPwd request) {
         return accountService.checkAccPw(request);
     }
+
+    @Operation(summary = "계좌이체")
+    @PostMapping("/transfer")
+    public ApiResponse transfer(@RequestBody AccountRequestDto.Transfer request) {
+        return accountService.transfer(request);
+    }
 }

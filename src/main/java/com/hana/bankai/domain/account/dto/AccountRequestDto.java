@@ -1,5 +1,6 @@
 package com.hana.bankai.domain.account.dto;
 
+import com.hana.bankai.global.common.enumtype.BankCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,15 @@ public class AccountRequestDto {
     public static class CheckAccPwd {
         private String accCode;
         private String accPwd;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class Transfer {
+        private String inAccCode;
+        private BankCode inBankCode;
+        private String outAccCode;
+        private BankCode outBankCode;
+        private Long amount;
     }
 }

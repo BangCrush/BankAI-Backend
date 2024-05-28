@@ -17,7 +17,8 @@ public enum SuccessCode {
     ACCOUNT_BALANCE_CHECK_SUCCESS(OK, "계좌 잔액 조회 성공"),
     ACCOUNT_SEARCH_SUCCESS(OK, "계좌 조회 성공"),
     ACCOUNT_LIMIT_CHECK_SUCCESS(OK, "이체한도 확인"),
-    ACCOUNT_PWD_CHECK_SUCCESS(OK, "계좌 비밀번호 확인")
+    ACCOUNT_PWD_CHECK_SUCCESS(OK, "계좌 비밀번호 확인"),
+    ACCOUNT_TRANSFER_SUCCESS(CREATED, "계좌이체 성공")
     ;
 
     private final HttpStatus httpStatus;
