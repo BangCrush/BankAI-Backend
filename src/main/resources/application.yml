@@ -8,9 +8,13 @@ spring:
       password: aaaa # 서버 redis 비밀번호
 
   datasource:
-    url: ENC(+Hw47OHHBD4u0hgOUM8Ui4vzWD8AwvEo9XRFIzys8rzZiSxYuzE9C5vESDHGflK6FGkSaTv3fQKHyZm/yzLtlznZS2jpG1AwtkvhTtvfm3rT2rnVZt0XMw==)
-    username: ENC(5coC5RV8Dpf6qeHKDrKZuQ==)
-    password: ENC(KDewUoWvVTcbeORnql1WAnmlB8USs29f)
+#    url: ENC(+Hw47OHHBD4u0hgOUM8Ui4vzWD8AwvEo9XRFIzys8rzZiSxYuzE9C5vESDHGflK6FGkSaTv3fQKHyZm/yzLtlznZS2jpG1AwtkvhTtvfm3rT2rnVZt0XMw==)
+#    username: ENC(5coC5RV8Dpf6qeHKDrKZuQ==)
+#    password: ENC(KDewUoWvVTcbeORnql1WAnmlB8USs29f)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/BankAI?characterEncoding=utf8
+    username: BangCrush
+    password: 111111
 
   jpa:
     hibernate:
