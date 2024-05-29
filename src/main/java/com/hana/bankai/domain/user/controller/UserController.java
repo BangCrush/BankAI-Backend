@@ -19,6 +19,8 @@ public class UserController {
     private final TokenService tokenService;
     private final UserService userService;
 
+    /* redis test code */
+
     @PostMapping
     public RefreshToken createUser(@RequestBody RefreshToken user) {
         return tokenService.save(user);
@@ -28,6 +30,8 @@ public class UserController {
     public Optional<RefreshToken> getUser(@PathVariable String id) {
         return tokenService.findById(id);
     }
+
+    /* register */
 
     @Operation(summary = "회원가입 여부 확인")
     @PostMapping("/register/check")
@@ -46,5 +50,12 @@ public class UserController {
     public ApiResponse<UserResponseDto.RegisterCheckId> registerCheckId(@RequestBody UserRequestDto.RegisterCheckId request) {
         return userService.registerCheckId(request);
     }
+
+    @Operation(summary = "회원가입")
+    @PostMapping("/register")
+    public ApiResponse<Object> register(@RequestBody UserRequestDto.Register request) {
+        return userService.register(request);
+    }
+
 
 }

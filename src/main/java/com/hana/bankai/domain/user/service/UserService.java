@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static com.hana.bankai.global.common.response.SuccessCode.*;
@@ -64,7 +63,7 @@ public class UserService {
 
     // 회원가입 여부 확인
     public ApiResponse<UserResponseDto.RegisterCheck> registerCheck(UserRequestDto.RegisterCheck request) {
-        // 계정이 이미 존재하면 true, 아니면 false 반환
+        // return value. 계정이 이미 존재하면 true, 아니면 false 반환
         Boolean value = false;
 
         if (userRepository.existsByUserInherentNumber(request.getUserInherentNumber())) {
@@ -76,7 +75,7 @@ public class UserService {
 
     // 중복 이메일 여부 확인
     public ApiResponse<UserResponseDto.RegisterCheckEmail> registerCheckEmail(UserRequestDto.RegisterCheckEmail request) {
-        // 중복이면 true, 아니면 false 반환
+        // return value. 중복이면 true, 아니면 false 반환
         Boolean value = false;
 
         if (userRepository.existsByUserEmail(request.getUserEmail())) {
@@ -88,7 +87,7 @@ public class UserService {
 
     // 중복 아이디 여부 확인
     public ApiResponse<UserResponseDto.RegisterCheckId> registerCheckId(UserRequestDto.RegisterCheckId request) {
-        // 중복이면 true, 아니면 false 반환
+        // return value. 중복이면 true, 아니면 false 반환
         Boolean value = false;
 
         if (userRepository.existsByUserId(request.getUserId())) {
@@ -98,22 +97,29 @@ public class UserService {
         return ApiResponse.success(USER_REGISTER_CHECK_ID_SUCCESS, new UserResponseDto.RegisterCheckId(value));
     }
 
-    /* Redis 관련 jwt 코드
-    public ResponseEntity<?> register(UserRequestDto.SignUp signUp) {
-        if (userRepository.existsByEmail(signUp.getEmail())) {
-            return response.fail("이미 회원가입된 이메일입니다.", HttpStatus.BAD_REQUEST);
-        }
-
+    // 회원가입
+    public ApiResponse<Object> register(UserRequestDto.Register register) {
+        // RequestDto to Entity
         User user = User.builder()
-                .email(signUp.getEmail())
-                .password(passwordEncoder.encode(signUp.getPassword()))
-                .roles(Collections.singletonList(Authority.ROLE_USER.name()))
+                .userId(register.getUserId())
+                .userPwd(register.getUserPwd())
+                .userName(register.getUserName())
+                .userInherentNumber(register.getUserInherentNumber())
+                .userPhone(register.getUserPhone())
+                .userAddr(register.getUserAddr())
+                .userAddrDetail(register.getUserAddrDetail())
+                .userNameEn(register.getUserNameEn())
+                .userEmail(register.getUserEmail())
                 .build();
-        usersRepository.save(user);
 
-        return response.success("회원가입에 성공했습니다.");
+        // DB 저장
+        userRepository.save(user);
+
+        // return
+        return ApiResponse.success(USER_REGISTER_SUCCESS);
     }
 
+    /*
     public ResponseEntity<?> login(UserRequestDto.Login login) {
 
         if (usersRepository.findByEmail(login.getEmail()).orElse(null) == null) {
@@ -196,7 +202,6 @@ public class UserService {
 
         return response.success("로그아웃 되었습니다.");
     }
-
-     */
+    */
 
 }

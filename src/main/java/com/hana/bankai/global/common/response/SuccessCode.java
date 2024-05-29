@@ -14,6 +14,7 @@ public enum SuccessCode {
     USER_REGISTER_CHECK_SUCCESS(OK, "회원가입 여부 확인 성공"),
     USER_REGISTER_CHECK_EMAIL_SUCCESS(OK, "이메일 중복 확인 성공"),
     USER_REGISTER_CHECK_ID_SUCCESS(OK, "아이디 중복 확인 성공"),
+    USER_REGISTER_SUCCESS(OK, "회원가입 성공"),
     USER_LOGIN_SUCCESS(OK, "로그인 성공"),
 
     // Account
