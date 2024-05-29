@@ -62,7 +62,7 @@ public class UserService {
 
 
     // 회원가입 여부 확인
-    public ApiResponse<UserResponseDto.RegisterCheck> registerCheck(UserRequestDto.RegisterCheck request) {
+    public ApiResponse<UserResponseDto.RegisterDuplicateCheck> registerCheck(UserRequestDto.RegisterCheck request) {
         // return value. 계정이 이미 존재하면 true, 아니면 false 반환
         Boolean value = false;
 
@@ -70,11 +70,11 @@ public class UserService {
             value = true;
         }
 
-        return ApiResponse.success(USER_REGISTER_CHECK_SUCCESS, new UserResponseDto.RegisterCheck(value));
+        return ApiResponse.success(USER_REGISTER_CHECK_SUCCESS, new UserResponseDto.RegisterDuplicateCheck(value));
     }
 
     // 중복 이메일 여부 확인
-    public ApiResponse<UserResponseDto.RegisterCheckEmail> registerCheckEmail(UserRequestDto.RegisterCheckEmail request) {
+    public ApiResponse<UserResponseDto.RegisterDuplicateCheck> registerCheckEmail(UserRequestDto.RegisterCheckEmail request) {
         // return value. 중복이면 true, 아니면 false 반환
         Boolean value = false;
 
@@ -82,11 +82,11 @@ public class UserService {
             value = true;
         }
 
-        return ApiResponse.success(USER_REGISTER_CHECK_EMAIL_SUCCESS, new UserResponseDto.RegisterCheckEmail(value));
+        return ApiResponse.success(USER_REGISTER_CHECK_EMAIL_SUCCESS, new UserResponseDto.RegisterDuplicateCheck(value));
     }
 
     // 중복 아이디 여부 확인
-    public ApiResponse<UserResponseDto.RegisterCheckId> registerCheckId(UserRequestDto.RegisterCheckId request) {
+    public ApiResponse<UserResponseDto.RegisterDuplicateCheck> registerCheckId(UserRequestDto.RegisterCheckId request) {
         // return value. 중복이면 true, 아니면 false 반환
         Boolean value = false;
 
@@ -94,7 +94,7 @@ public class UserService {
             value = true;
         }
 
-        return ApiResponse.success(USER_REGISTER_CHECK_ID_SUCCESS, new UserResponseDto.RegisterCheckId(value));
+        return ApiResponse.success(USER_REGISTER_CHECK_ID_SUCCESS, new UserResponseDto.RegisterDuplicateCheck(value));
     }
 
     // 회원가입

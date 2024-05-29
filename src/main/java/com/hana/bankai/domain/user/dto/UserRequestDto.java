@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 public class UserRequestDto {
 
     @Getter
-    @Setter
     // 회원가입 여부 확인
     public static class RegisterCheck {
         @NotEmpty(message = "주민등록번호는 필수 입력값입니다.")
@@ -18,7 +17,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     // 중복 이메일 확인
     public static class RegisterCheckEmail {
         @NotEmpty(message = "이메일는 필수 입력값입니다.")
@@ -26,7 +24,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     // 중복 ID 확인
     public static class RegisterCheckId {
         @NotEmpty(message = "아이디는 필수 입력값입니다.")
@@ -34,7 +31,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     @Builder
     public static class Register {
         @NotEmpty(message = "ID를 입력하세요.")
@@ -66,6 +62,8 @@ public class UserRequestDto {
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식에 맞지 않습니다.")
         private String userEmail;
     }
+
+    /* 로그인 기능 구현 시 사용할 코드 */
 
     @Getter
     @Setter

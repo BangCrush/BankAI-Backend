@@ -7,24 +7,9 @@ public class UserResponseDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    // 회원가입 여부 확인
-    public static class RegisterCheck {
-        private Boolean check;
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
-    // 중복 이메일 확인
-    public static class RegisterCheckEmail {
-        private Boolean check;
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
-    // 중복 아이디 확인
-    public static class RegisterCheckId {
+    // 회원가입 시 중복 계정, 이메일, 아이디 여부 확인
+    public static class RegisterDuplicateCheck {
+        // 중복이면 true, 아니면 false 반환
         private Boolean check;
     }
 
