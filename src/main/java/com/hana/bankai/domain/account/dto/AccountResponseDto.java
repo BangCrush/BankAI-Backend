@@ -1,12 +1,12 @@
 package com.hana.bankai.domain.account.dto;
 
 import com.hana.bankai.domain.account.entity.Account;
+import com.hana.bankai.domain.accounthistory.entity.AccountHistory;
 import com.hana.bankai.domain.accounthistory.entity.HisType;
 import com.hana.bankai.domain.product.entity.ProdType;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class AccountResponseDto {
 
@@ -42,6 +42,16 @@ public class AccountResponseDto {
         private String target;
         private Long hisAmount;
         private Long balance;
+
+        public static getAccHis from(AccountHistory accHis, String target, Long hisAmount, Long balance) {
+            return getAccHis.builder()
+                    .hisDateTime(accHis.getHisDateTime())
+                    .hisType(accHis.getHisType())
+                    .target(target)
+                    .hisAmount(hisAmount)
+                    .balance(balance)
+                    .build();
+        }
     }
 
     @Getter
@@ -61,16 +71,6 @@ public class AccountResponseDto {
                     .prodName(acc.getProduct().getProdName())
                     .prodType(acc.getProduct().getProdType())
                     .build();
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class ResponseList {
-        private List<getAccInfo> accInfoList;
-
-        public ResponseList(List<getAccInfo> accList) {
-            this.accInfoList = accList;
         }
     }
 }

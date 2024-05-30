@@ -193,15 +193,7 @@ public class AccountService {
             Long hisAmount = isDeposit ? accHisReq.getHisAmount() : -accHisReq.getHisAmount();
             Long balance = isDeposit ? accHisReq.getAfterInBal() : accHisReq.getAfterOutBal();
 
-            AccountResponseDto.getAccHis accHisRes = AccountResponseDto.getAccHis.builder()
-                    .hisDateTime(accHisReq.getHisDateTime())
-                    .hisType(accHisReq.getHisType())
-                    .target(targetUser.getUserName())
-                    .hisAmount(hisAmount)
-                    .balance(balance)
-                    .build();
-
-            accHisDataList.add(accHisRes);
+            accHisDataList.add(AccountResponseDto.getAccHis.from(accHisReq, targetUser.getUserName(), hisAmount, balance));
         }
 
         return accHisDataList;
