@@ -73,9 +73,6 @@ public class User implements UserDetails {
     @Column(updatable = false) // 컬럼 수정 불가
     private LocalDate userCreatedAt;
 
-    @OneToOne(mappedBy = "user") // cf."user_job"이 아니라 "user"
-    private UserJob userJob;
-
     @Column
     private String userMainAcc;
 
