@@ -18,7 +18,10 @@ public enum ErrorCode {
 
     // Redis
     LOCK_NOT_AVAILABLE("E400", "사용할 수 없는 락"),
-    LOCK_INTERRUPTED_ERROR("E401", "락 획득 시 인터럽트 발생")
+    LOCK_INTERRUPTED_ERROR("E401", "락 획득 시 인터럽트 발생"),
+
+    //Product
+    PRODUCT_NOT_SEARCH("E300","해당하는 상품을 찾을 수 없습니다")
     ;
 
     private final String code;

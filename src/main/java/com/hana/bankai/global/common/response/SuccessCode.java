@@ -11,6 +11,10 @@ import static org.springframework.http.HttpStatus.*;
 public enum SuccessCode {
 
     // User
+    USER_REGISTER_CHECK_SUCCESS(OK, "회원가입 여부 확인 성공"),
+    USER_REGISTER_CHECK_EMAIL_SUCCESS(OK, "이메일 중복 확인 성공"),
+    USER_REGISTER_CHECK_ID_SUCCESS(OK, "아이디 중복 확인 성공"),
+    USER_REGISTER_SUCCESS(OK, "회원가입 성공"),
     USER_LOGIN_SUCCESS(OK, "로그인 성공"),
 
     // Account
@@ -18,7 +22,10 @@ public enum SuccessCode {
     ACCOUNT_SEARCH_SUCCESS(OK, "계좌 조회 성공"),
     ACCOUNT_LIMIT_CHECK_SUCCESS(OK, "이체한도 확인"),
     ACCOUNT_PWD_CHECK_SUCCESS(OK, "계좌 비밀번호 확인"),
-    ACCOUNT_TRANSFER_SUCCESS(CREATED, "계좌이체 성공")
+    ACCOUNT_TRANSFER_SUCCESS(CREATED, "계좌이체 성공"),
+
+    // Product
+    PRODUCT_SEARCH_SUCCESS(OK, "상품 조회 성공")
     ;
 
     private final HttpStatus httpStatus;
