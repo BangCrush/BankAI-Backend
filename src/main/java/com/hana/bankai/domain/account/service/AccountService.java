@@ -208,7 +208,7 @@ public class AccountService {
             Long hisAmount = isDeposit ? accHisReq.getHisAmount() : -accHisReq.getHisAmount();
             Long balance = isDeposit ? accHisReq.getAfterInBal() : accHisReq.getAfterOutBal();
 
-            accHisDataList.add(AccountResponseDto.GetAccHis.from(accHisReq, targetUser.getUserName(), hisAmount, balance));
+            accHisDataList.add(AccountResponseDto.GetAccHis.of(accHisReq, targetUser.getUserName(), hisAmount, balance));
         }
 
         return accHisDataList;

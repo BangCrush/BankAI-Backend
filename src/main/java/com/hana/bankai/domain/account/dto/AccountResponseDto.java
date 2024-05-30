@@ -43,7 +43,7 @@ public class AccountResponseDto {
         private Long hisAmount;
         private Long balance;
 
-        public static GetAccHis from(AccountHistory accHis, String target, Long hisAmount, Long balance) {
+        public static GetAccHis of(AccountHistory accHis, String target, Long hisAmount, Long balance) {
             return GetAccHis.builder()
                     .hisDateTime(accHis.getHisDateTime())
                     .hisType(accHis.getHisType())
