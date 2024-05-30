@@ -4,14 +4,16 @@ spring:
 
   data:
     redis:
-      host: localhost # 퍼블릭 IPv4 주소
+      host: ENC(5+NOMMpEiySdyX9K7K9Br0kiedxrd9T7) # 퍼블릭 IPv4 주소
       port: 6379
-      password: aaaa # 서버 redis 비밀번호
+      password: ENC(91A7oHbACBzXVDccNZlf8QBrkocwo922) # 서버 redis 비밀번호
 
   datasource:
     url: ENC(+Hw47OHHBD4u0hgOUM8Ui4vzWD8AwvEo9XRFIzys8rzZiSxYuzE9C5vESDHGflK6FGkSaTv3fQKHyZm/yzLtlznZS2jpG1AwtkvhTtvfm3rT2rnVZt0XMw==)
     username: ENC(5coC5RV8Dpf6qeHKDrKZuQ==)
     password: ENC(KDewUoWvVTcbeORnql1WAnmlB8USs29f)
+    hikari:
+      max-lifetime: 177000
 
   jpa:
     hibernate:

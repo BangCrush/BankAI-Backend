@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/account")
@@ -37,5 +39,29 @@ public class AccountController {
     @PostMapping("/check-pw")
     public ApiResponse<AccountResponseDto.CheckRes> checkAccPwd(@RequestBody AccountRequestDto.CheckAccPwd request) {
         return accountService.checkAccPw(request);
+    }
+
+    @Operation(summary = "계좌이체")
+    @PostMapping("/transfer")
+    public ApiResponse transfer(@RequestBody AccountRequestDto.Transfer request) {
+        return accountService.transfer(request);
+    }
+
+    @Operation(summary = "거래내역 조회")
+    @GetMapping("/history")
+    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request) {
+        return accountService.getAccHis(request);
+    }
+
+    @Operation(summary = "사용자 보유 계좌 조회")
+    @GetMapping("/list")
+    public ApiResponse<List<AccountResponseDto.GetAccInfo>> getAccList() {
+        return accountService.getAccList();
+    }
+
+    @Operation(summary = "사용자 총 자산 조회")
+    @GetMapping("/assets")
+    public ApiResponse<AccountResponseDto.GetAssets> getAssests() {
+        return accountService.getAssets();
     }
 }

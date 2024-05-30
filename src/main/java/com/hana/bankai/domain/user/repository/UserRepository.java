@@ -10,10 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-
-    // 로그인 - 입력받은 아이디 기준으로 계정 조회
-    Optional<User> findByUserId(String userId);
-
     // 회원가입 여부 확인
     Boolean existsByUserInherentNumber(String userInherentNumber);
 
@@ -22,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     // 중복 ID 확인
     Boolean existsByUserId(String userId);
+  
+    // 로그인 - 입력받은 아이디 기준으로 계정 조회
+    Optional<User> findByUserId(String userId);
 
     // 아이디 조회
     @Query("select u.userId from user u where u.userNameKr = :userNameKr and u.userEmail = :userEmail")
@@ -30,5 +29,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // 비밀번호 조회
     @Query("select u.userPwd from user u where u.userNameKr = :userNameKr and u.userId = :userId and u.userEmail = :userEmail")
     Optional<String> findUserPwdByUserNameKrAndUserIdAndUserEmail(String userNameKr, String userId, String userEmail);
-
 }

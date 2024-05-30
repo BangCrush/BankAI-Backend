@@ -76,17 +76,18 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user") // cf."user_job"이 아니라 "user"
     private UserJob userJob;
 
-    @ColumnDefault("1000000")
-    @Builder.Default()
-    @Column
-    private Long userTrsfLimit = 1000000L;
-
     @Column
     private String userMainAcc;
 
     @OneToMany(mappedBy = "user") // One(user) to Many(account)
     @JsonManagedReference // 순환 참조 해결
     private final List<Account> accountList = new ArrayList<>();
+  
+    @OneToOne(mappedBy = "user") // cf."user_job"이 아니라 "user"
+    private UserJob userJob;
+
+    @OneToOne(mappedBy = "user")
+    private UserTrsfLimit userTrsfLimit;
 
     // 권한 목록
     @Column
@@ -124,4 +125,5 @@ public class User implements UserDetails {
     // 사용자 활성화 여부 (true: 활성화)
     @Override
     public boolean isEnabled() { return true; }
+
 }

@@ -71,4 +71,9 @@ public class Account {
     @OneToMany(mappedBy = "account") // One(account) to Many(autotransfer)
     @JsonManagedReference // 순환 참조 해결
     private final List<AutoTransfer> autoTransferList = new ArrayList<>();
+
+    public Account transfer(Long amount) {
+        accBalance += amount;
+        return this;
+    }
 }
