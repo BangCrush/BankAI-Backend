@@ -8,7 +8,9 @@ import com.hana.bankai.domain.account.repository.AccountRepository;
 import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
 import com.hana.bankai.domain.user.entity.User;
+import com.hana.bankai.domain.user.entity.UserTrsfLimit;
 import com.hana.bankai.domain.user.repository.UserRepository;
+import com.hana.bankai.domain.user.repository.UserTrsfLimitRepository;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 //import com.hana.bankai.global.security.jwt.JwtTokenProvider;
@@ -37,8 +39,8 @@ import static com.hana.bankai.global.error.ErrorCode.*;
 public class UserService {
 
     private final AccountRepository accountRepository;
-
     private final UserRepository userRepository;
+    private final UserTrsfLimitRepository trsfLimitRepository;
 //    private final Response response;
     private final BCryptPasswordEncoder passwordEncoder;
 //    private final JwtTokenProvider jwtTokenProvider;
@@ -114,6 +116,12 @@ public class UserService {
 
         // DB 저장
         userRepository.save(user);
+
+        // UserTrsfLimit 생성
+        UserTrsfLimit userTrsfLimit = UserTrsfLimit.builder()
+                .user(user)
+                .build();
+        trsfLimitRepository.save(userTrsfLimit);
 
         // return
         return ApiResponse.success(USER_REGISTER_SUCCESS);
