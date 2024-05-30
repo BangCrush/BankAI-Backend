@@ -88,8 +88,7 @@ public class AccountService {
             throw new CustomException(INVALID_TRANSFER_AMOUNT);
         }
         // 이체한도 예외처리
-        // 사용자 일일 이체한도 예외처리 (개발 예정)
-        if (outAcc.getAccTrsfLimit() < request.getAmount()) {
+        if (outAcc.getAccTrsfLimit() < request.getAmount() || trsfLimitService.checkTrsfLimit(userCode, request.getAmount())) {
             throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
         }
 

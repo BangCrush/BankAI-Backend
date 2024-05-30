@@ -19,8 +19,22 @@ public class UserTrsfLimitService {
     final private UserTrsfLimitRepository trsfLimitRepository;
 
     public void accumulate(UUID userCode, Long amount) {
+        UserTrsfLimit userTrsfLimit = findUserTrsfLimitByUserCode(userCode);
+        userTrsfLimit.accumulate(amount);
+    }
+
+    public boolean checkTrsfLimit(UUID userCode, Long amount) {
+        UserTrsfLimit userTrsfLimit = findUserTrsfLimitByUserCode(userCode);
+        if (userTrsfLimit.getDailyAccAmount() + amount > userTrsfLimit.getDailyLimit()) {
+            return true;
+        }
+        return false;
+    }
+
+    private UserTrsfLimit findUserTrsfLimitByUserCode(UUID userCode) {
         UserTrsfLimit userTrsfLimit = trsfLimitRepository.findById(userCode)
                 .orElseThrow(() -> new CustomException(USER_TRSF_LIMIT_NOT_FOUND));
-        userTrsfLimit.accumulate(amount);
+
+        return userTrsfLimit;
     }
 }
