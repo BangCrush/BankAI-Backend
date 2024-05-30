@@ -70,4 +70,12 @@ public class UserController {
         return userService.loginFindPwd(request);
     }
 
+    /* logout */
+
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logouts")
+    public ApiResponse<Object> logout(@RequestBody UserRequestDto.Logout request) {
+        return userService.logout(request);
+    }
+
 }

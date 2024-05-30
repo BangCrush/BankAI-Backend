@@ -1,10 +1,5 @@
 package com.hana.bankai.domain.user.service;
 
-import com.hana.bankai.domain.account.dto.AccountRequestDto;
-import com.hana.bankai.domain.account.dto.AccountResponseDto;
-import com.hana.bankai.domain.account.entity.AccStatus;
-import com.hana.bankai.domain.account.entity.Account;
-import com.hana.bankai.domain.account.repository.AccountRepository;
 import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
 import com.hana.bankai.domain.user.entity.Role;
@@ -16,8 +11,6 @@ import com.hana.bankai.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -27,7 +20,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -155,11 +147,10 @@ public class UserService implements UserDetailsService {
         String userPwd = userRepository.findUserPwdByUserNameKrAndUserIdAndUserEmail(request.getUserNameKr(), request.getUserId(), request.getUserEmail())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        return ApiResponse.success(USER_FIND_ID_SUCCESS, new UserResponseDto.LoginFindPwd(userPwd));
+        return ApiResponse.success(USER_FIND_PWD_SUCCESS, new UserResponseDto.LoginFindPwd(userPwd));
     }
 
-    /*
-
+    /* token 재발급
     public ResponseEntity<?> reissue(UserRequestDto.Reissue reissue) {
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(reissue.getRefreshToken())) {
@@ -188,17 +179,19 @@ public class UserService implements UserDetailsService {
 
         return response.success(tokenInfo, "Token 정보가 갱신되었습니다.", HttpStatus.OK);
     }
+    */
 
-    public ResponseEntity<?> logout(UserRequestDto.Logout logout) {
+    // 로그아웃
+    public ApiResponse<Object> logout(UserRequestDto.Logout logout) {
         // 1. Access Token 검증
         if (!jwtTokenProvider.validateToken(logout.getAccessToken())) {
-            return response.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+            throw new CustomException(USER_LOGOUT_ACCESS_TOKEN_VALIDATION_FAIL);
         }
 
         // 2. Access Token 에서 User email 을 가져옵니다.
         Authentication authentication = jwtTokenProvider.getAuthentication(logout.getAccessToken());
 
-        // 3. Redis 에서 해당 User email 로 저장된 Refresh Token 이 있는지 여부를 확인 후 있을 경우 삭제합니다.
+        // 3. Redis 에서 해당 User ID 로 저장된 Refresh Token 이 있는지 여부를 확인 후 있을 경우 삭제
         if (redisTemplate.opsForValue().get("RT:" + authentication.getName()) != null) {
             // Refresh Token 삭제
             redisTemplate.delete("RT:" + authentication.getName());
@@ -208,10 +201,9 @@ public class UserService implements UserDetailsService {
         Long expiration = jwtTokenProvider.getExpiration(logout.getAccessToken());
         redisTemplate.opsForValue()
                 .set(logout.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
-        // 5. 이후 JwtAuthenticationFilter 에서 redis에 있는 logout 정보를 가지고 와서 접근을 거부함
+        // 5. 이후 JwtAuthenticationFilter 에서 redis 에 있는 logout 정보를 가지고 와서 접근을 거부함
 
-        return response.success("로그아웃 되었습니다.");
+        return ApiResponse.success(USER_LOGOUT_SUCCESS);
     }
 
-    */
 }
