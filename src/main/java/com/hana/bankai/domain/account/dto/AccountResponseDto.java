@@ -1,9 +1,9 @@
 package com.hana.bankai.domain.account.dto;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.hana.bankai.domain.accounthistory.entity.HisType;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 public class AccountResponseDto {
 
@@ -27,5 +27,17 @@ public class AccountResponseDto {
     @AllArgsConstructor
     public static class CheckRes {
         private Boolean check;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class getAccHis {
+        private LocalDateTime hisDateTime;
+        private HisType hisType;
+        private String target;
+        private Long hisAmount;
+        private Long balance;
     }
 }

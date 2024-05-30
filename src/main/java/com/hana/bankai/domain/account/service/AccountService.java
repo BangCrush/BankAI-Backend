@@ -5,9 +5,14 @@ import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccStatus;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
+import com.hana.bankai.domain.accounthistory.entity.AccountHistory;
+import com.hana.bankai.domain.accounthistory.repository.AccHisRepository;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
+import com.hana.bankai.domain.user.entity.User;
+import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.service.UserTrsfLimitService;
 import com.hana.bankai.global.aop.DistributedLock;
+import com.hana.bankai.global.common.enumtype.BankCode;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +22,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.hana.bankai.domain.accounthistory.entity.HisType.*;
@@ -29,6 +36,8 @@ import static com.hana.bankai.global.error.ErrorCode.*;
 public class AccountService {
 
     final private AccountRepository accountRepository;
+    final private AccHisRepository accHisRepository;
+    final private UserRepository userRepository;
     final private AccHisService accHisService;
     final private UserTrsfLimitService trsfLimitService;
     final PlatformTransactionManager transactionManager;
@@ -42,8 +51,7 @@ public class AccountService {
     }
 
     public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
-        Account account = accountRepository.findById(request.getAccCode())
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+        Account account = getAccByAccCode(request.getAccCode());
 
         // 해지된 계좌인지 확인
         checkAccStatus(account);
@@ -76,10 +84,8 @@ public class AccountService {
         String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
         UUID userCode = UUID.fromString(uuidString);
 
-        Account outAcc = accountRepository.findById(request.getOutAccCode())
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        Account inAcc = accountRepository.findById(request.getInAccCode())
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+        Account outAcc = getAccByAccCode(request.getOutAccCode());
+        Account inAcc = getAccByAccCode(request.getInAccCode());
 
         // 해지된 계좌 예외처리
         checkAccStatus(inAcc);
@@ -113,6 +119,31 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_TRANSFER_SUCCESS);
     }
 
+    public ApiResponse<List<AccountResponseDto.getAccHis>> getAccHis(AccountRequestDto.AccCodeReq request) {
+        // 예외처리
+        Account acc = getAccByAccCode(request.getAccCode());
+
+        List<AccountResponseDto.getAccHis> accHisList = new ArrayList<>();
+        try {
+            // 입금
+            List<AccountHistory> accHisDepositList = accHisRepository.findByInAccCodeAndInBankCode(acc.getAccCode(), BankCode.C04);
+            // 출금
+            List<AccountHistory> accHisWithdrawList = accHisRepository.findByOutAccCodeAndOutBankCode(acc.getAccCode(), BankCode.C04);
+
+            accHisList.addAll(makeAccHisDataList(accHisDepositList, true));
+            accHisList.addAll(makeAccHisDataList(accHisWithdrawList, false));
+        } catch (Exception e) {
+            throw new CustomException(FIND_ACCOUNT_HISTORY_FAIL);
+        }
+
+        return ApiResponse.success(FIND_ACCOUNT_HISTORY_SUCCESS, accHisList);
+    }
+
+    private Account getAccByAccCode(String accCode) {
+        return accountRepository.findById(accCode)
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+    }
+
     private Long retrieveBalance(String accCode) {
         return accountRepository.findAccBalanceByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
@@ -133,6 +164,32 @@ public class AccountService {
         if (acc.getStatus() == AccStatus.DELETED) {
             throw new CustomException(ACCOUNT_NOT_FOUND);
         }
+    }
+
+    private List<AccountResponseDto.getAccHis> makeAccHisDataList(List<AccountHistory> accHisList, boolean isDeposit) {
+        List<AccountResponseDto.getAccHis> accHisDataList = new ArrayList<>();
+
+        for (AccountHistory accHisReq : accHisList) {
+            String targetAccCode = isDeposit ? accHisReq.getOutAccCode() : accHisReq.getInAccCode();
+            Account targetAcc = getAccByAccCode(targetAccCode);
+            User targetUser = userRepository.findById(targetAcc.getUser().getUserCode())
+                    .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+            Long hisAmount = isDeposit ? accHisReq.getHisAmount() : -accHisReq.getHisAmount();
+            Long balance = isDeposit ? accHisReq.getAfterInBal() : accHisReq.getAfterOutBal();
+
+            AccountResponseDto.getAccHis accHisRes = AccountResponseDto.getAccHis.builder()
+                    .hisDateTime(accHisReq.getHisDateTime())
+                    .hisType(accHisReq.getHisType())
+                    .target(targetUser.getUserName())
+                    .hisAmount(hisAmount)
+                    .balance(balance)
+                    .build();
+
+            accHisDataList.add(accHisRes);
+        }
+
+        return accHisDataList;
     }
 }
 

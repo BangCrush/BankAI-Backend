@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/account")
@@ -43,5 +45,11 @@ public class AccountController {
     @PostMapping("/transfer")
     public ApiResponse transfer(@RequestBody AccountRequestDto.Transfer request) {
         return accountService.transfer(request);
+    }
+
+    @Operation(summary = "거래내역 조회")
+    @GetMapping("/history")
+    public ApiResponse<List<AccountResponseDto.getAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request) {
+        return accountService.getAccHis(request);
     }
 }

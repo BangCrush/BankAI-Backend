@@ -23,6 +23,7 @@ public enum SuccessCode {
     ACCOUNT_LIMIT_CHECK_SUCCESS(OK, "이체한도 확인"),
     ACCOUNT_PWD_CHECK_SUCCESS(OK, "계좌 비밀번호 확인"),
     ACCOUNT_TRANSFER_SUCCESS(CREATED, "계좌이체 성공"),
+    FIND_ACCOUNT_HISTORY_SUCCESS(OK, "거래내역 조회 성공"),
 
     // Product
     PRODUCT_SEARCH_SUCCESS(OK, "상품 조회 성공")
