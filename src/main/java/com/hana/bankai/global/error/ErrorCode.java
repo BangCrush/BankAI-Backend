@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ErrorCode {
     // User
     USER_NOT_FOUND("E100", "존재하지 않는 회원입니다."),
+    USER_TRSF_LIMIT_NOT_FOUND("E101", "사용자 일일 이체 한도 조회 불가"),
 
     // Account
     ACCOUNT_NOT_FOUND("E200", "존재하지 않는 계좌입니다."),

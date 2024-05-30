@@ -35,4 +35,8 @@ public class UserTrsfLimit {
     @Builder.Default()
     @Column
     private Long dailyAccAmount = 0L;
+
+    public void accumulate(Long amount) {
+        dailyAccAmount += amount;
+    }
 }

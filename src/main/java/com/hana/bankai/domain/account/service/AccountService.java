@@ -6,6 +6,7 @@ import com.hana.bankai.domain.account.entity.AccStatus;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
+import com.hana.bankai.domain.user.service.UserTrsfLimitService;
 import com.hana.bankai.global.aop.DistributedLock;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
@@ -15,6 +16,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import java.util.UUID;
 
 import static com.hana.bankai.domain.accounthistory.entity.HisType.*;
 import static com.hana.bankai.global.common.response.SuccessCode.*;
@@ -27,6 +30,7 @@ public class AccountService {
 
     final private AccountRepository accountRepository;
     final private AccHisService accHisService;
+    final private UserTrsfLimitService trsfLimitService;
     final PlatformTransactionManager transactionManager;
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(AccountRequestDto.AccCodeReq request) {
@@ -68,6 +72,9 @@ public class AccountService {
     @DistributedLock(key = "#request.getOutAccCode()")
     public ApiResponse transfer(AccountRequestDto.Transfer request) {
         // 사용자 인증 확인 (개발 예정)
+        // 테스트용
+        String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
+        UUID userCode = UUID.fromString(uuidString);
 
         Account outAcc = accountRepository.findById(request.getOutAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
@@ -93,6 +100,8 @@ public class AccountService {
             transactionManager.commit(status); // 성공 시 커밋
             // 계좌 로그 생성
             accHisService.createAccHis(request.getAmount(), TRANSFER, inAcc, outAcc);
+            // 사용자 이체 한도 > 누적 금액 수정
+            trsfLimitService.accumulate(userCode, request.getAmount());
         } catch (CustomException e) {
             if (e.getErrorCode().getCode().equals("E201")) {
                 throw e;
