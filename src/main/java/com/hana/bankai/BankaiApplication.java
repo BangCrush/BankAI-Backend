@@ -9,6 +9,7 @@ import static io.lettuce.core.pubsub.PubSubOutput.Type.message;
 
 @EnableJpaAuditing
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@EnableJpaAuditing
 public class BankaiApplication {
 
     public static void main(String[] args) {
