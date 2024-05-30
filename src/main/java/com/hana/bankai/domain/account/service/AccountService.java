@@ -56,7 +56,7 @@ public class AccountService {
         // 해지된 계좌인지 확인
         checkAccStatus(account);
 
-        String userName = account.getUser().getUserName();
+        String userName = account.getUser().getUserNameKr();
         return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
     }
 

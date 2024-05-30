@@ -1,35 +1,23 @@
 package com.hana.bankai.domain.user.controller;
 
-import com.hana.bankai.domain.user.dto.RefreshToken;
 import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
-import com.hana.bankai.domain.user.service.TokenService;
 import com.hana.bankai.domain.user.service.UserService;
 import com.hana.bankai.global.common.response.ApiResponse;
+import com.hana.bankai.global.error.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import static com.hana.bankai.global.error.ErrorCode.USER_REGISTER_VALIDATION_FAIL;
 
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
-    private final TokenService tokenService;
     private final UserService userService;
-
-    /* redis test code */
-
-    @PostMapping
-    public RefreshToken createUser(@RequestBody RefreshToken user) {
-        return tokenService.save(user);
-    }
-
-    @GetMapping("/{id}")
-    public Optional<RefreshToken> getUser(@PathVariable String id) {
-        return tokenService.findById(id);
-    }
 
     /* register */
 
@@ -53,9 +41,41 @@ public class UserController {
 
     @Operation(summary = "회원가입")
     @PostMapping("/register")
-    public ApiResponse<Object> register(@RequestBody UserRequestDto.Register request) {
+    public ApiResponse<Object> register(@Validated @RequestBody UserRequestDto.Register request, Errors errors) {
+        // validation check
+        if(errors.hasErrors()) {
+            throw new CustomException(USER_REGISTER_VALIDATION_FAIL);
+        }
+
         return userService.register(request);
     }
 
+    /* login */
+
+    @Operation(summary = "로그인")
+    @PostMapping("/login")
+    public ApiResponse<UserResponseDto.TokenInfo> login(@RequestBody UserRequestDto.Login request) {
+        return userService.login(request);
+    }
+
+    @Operation(summary = "아이디 찾기")
+    @PostMapping("/login/find-id")
+    public ApiResponse<UserResponseDto.LoginFindId> loginFindId(@RequestBody UserRequestDto.LoginFindId request) {
+        return userService.loginFindId(request);
+    }
+
+    @Operation(summary = "비밀번호 찾기")
+    @PostMapping("/login/find-pwd")
+    public ApiResponse<UserResponseDto.LoginFindPwd> loginFindId(@RequestBody UserRequestDto.LoginFindPwd request) {
+        return userService.loginFindPwd(request);
+    }
+
+    /* logout */
+
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logouts")
+    public ApiResponse<Object> logout(@RequestBody UserRequestDto.Logout request) {
+        return userService.logout(request);
+    }
 
 }

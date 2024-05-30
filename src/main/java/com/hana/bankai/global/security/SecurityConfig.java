@@ -1,7 +1,7 @@
 package com.hana.bankai.global.security;
 
-//import com.hana.bankai.global.security.jwt.JwtAuthenticationFilter;
-//import com.hana.bankai.global.security.jwt.JwtTokenProvider;
+import com.hana.bankai.global.security.jwt.JwtAuthenticationFilter;
+import com.hana.bankai.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
 
     @Bean
@@ -30,11 +30,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 로그인 하지 않아도 접근 가능한 주소
-    private static final String[] AUTH_WHITELIST = {
-            "/api/v1/member/**", "/swagger-ui/**", "/api-docs", "/swagger-ui-custom.html", "/v1/**",
-            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html", "/api/v1/auth/**"
-    };
+    // 로그인 하지 않아도 접근 가능한 주소 설정
+    private static final String[] AUTH_WHITELIST = {};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -51,19 +48,20 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         // JwtAuthFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
-//        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
+        // 권한이 없거나 부족할 때 발생할 예외 처리
 //        http.exceptionHandling((exceptionHandling) -> exceptionHandling
 //                .authenticationEntryPoint(authenticationEntryPoint)
 //                .accessDeniedHandler(accessDeniedHandler)
 //        );
 
         // 권한 규칙 작성
+        // 필요하면, 각 Controller 에서 "@PreAuthrization" 사용. 따라서 모든 경로에 대한 인증처리는 Pass.
         http.authorizeHttpRequests(authorize -> authorize
 //                        .requestMatchers(AUTH_WHITELIST).permitAll()
-//                        @PreAuthrization을 사용할 것이기 때문에 모든 경로에 대한 인증처리는 Pass
-                        .anyRequest().permitAll()
 //                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
         );
 
         return http.build();

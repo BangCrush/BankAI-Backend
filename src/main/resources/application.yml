@@ -1,6 +1,7 @@
 spring:
   application:
     name: bankai
+
   data:
     redis:
       host: ENC(5+NOMMpEiySdyX9K7K9Br0kiedxrd9T7) # 퍼블릭 IPv4 주소
@@ -22,3 +23,6 @@ spring:
         show_sql: true
         format_sql: true
         default_batch_fetch_size: 1000
+
+jwt:
+  secret: ENC(Nc28XGoNo/1g3LlvfKffOqNYPtDyBvStWb1oKvaSXSUN/TuvskfniY2kBHhOIbtkh41ewCtGcjgAizO+7Xjccg==)
