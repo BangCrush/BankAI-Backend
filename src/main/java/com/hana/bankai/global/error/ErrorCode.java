@@ -13,7 +13,11 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND("E200", "존재하지 않는 계좌입니다."),
     INSUFFICIENT_BALANCE("E201", "계좌 잔액이 부족합니다."),
     INVALID_TRANSFER_AMOUNT("E202", "유효하지 않은 이체 금액입니다."),
-    ACCOUNT_TRANSFER_FAIL("E203", "계좌이체 실패")
+    ACCOUNT_TRANSFER_FAIL("E203", "계좌이체 실패"),
+
+    // Redis
+    LOCK_NOT_AVAILABLE("E400", "사용할 수 없는 락"),
+    LOCK_INTERRUPTED_ERROR("E401", "락 획득 시 인터럽트 발생")
     ;
 
     private final String code;
