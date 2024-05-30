@@ -69,11 +69,6 @@ public class User {
     @NotNull
     private String userEmail;
 
-    @ColumnDefault("1000000")
-    @Builder.Default()
-    @Column
-    private Long userTrsfLimit = 1000000L;
-
     @Column
     private String userMainAcc;
 
@@ -83,4 +78,7 @@ public class User {
 
     @OneToOne(mappedBy = "user") // cf."user_job"이 아니라 "user"
     private UserJob userJob;
+
+    @OneToOne(mappedBy = "user")
+    private UserTrsfLimit userTrsfLimit;
 }
