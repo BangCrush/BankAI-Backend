@@ -39,4 +39,8 @@ public class UserTrsfLimit {
     public void accumulate(Long amount) {
         dailyAccAmount += amount;
     }
+
+    public void resetDailyAccAmount() {
+        dailyAccAmount = 0L;
+    }
 }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.hana.bankai.global.error.ErrorCode.USER_TRSF_LIMIT_NOT_FOUND;
@@ -29,6 +30,13 @@ public class UserTrsfLimitService {
             return true;
         }
         return false;
+    }
+
+    public void resetUserDailyTrsfLimit() {
+        List<UserTrsfLimit> userTrsfLimitList = trsfLimitRepository.findAll();
+        for (UserTrsfLimit userTrsfLimit : userTrsfLimitList) {
+            userTrsfLimit.resetDailyAccAmount();
+        }
     }
 
     private UserTrsfLimit findUserTrsfLimitByUserCode(UUID userCode) {
