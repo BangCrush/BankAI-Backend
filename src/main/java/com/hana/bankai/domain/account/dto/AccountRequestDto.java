@@ -1,15 +1,14 @@
 package com.hana.bankai.domain.account.dto;
 
 import com.hana.bankai.global.common.enumtype.BankCode;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class AccountRequestDto {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class AccCodeReq {
         private String accCode;
     }
@@ -30,6 +29,8 @@ public class AccountRequestDto {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Transfer {
         private String inAccCode;
         private BankCode inBankCode;
