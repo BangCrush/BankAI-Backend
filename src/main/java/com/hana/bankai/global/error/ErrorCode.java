@@ -14,6 +14,7 @@ public enum ErrorCode {
     INSUFFICIENT_BALANCE("E201", "계좌 잔액이 부족합니다."),
     INVALID_TRANSFER_AMOUNT("E202", "유효하지 않은 이체 금액입니다."),
     ACCOUNT_TRANSFER_FAIL("E203", "계좌이체 실패"),
+    TRANSFER_LIMIT_EXCEEDED("E204", "이체한도 초과"),
 
     // Redis
     LOCK_NOT_AVAILABLE("E400", "사용할 수 없는 락"),

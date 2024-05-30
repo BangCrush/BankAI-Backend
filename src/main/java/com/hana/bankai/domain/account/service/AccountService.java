@@ -39,9 +39,7 @@ public class AccountService {
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
 
         // 해지된 계좌인지 확인
-        if (account.getStatus() == AccStatus.DELETED) {
-            throw new CustomException(ACCOUNT_NOT_FOUND);
-        }
+        checkAccStatus(account);
 
         String userName = account.getUser().getUserName();
         return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
@@ -73,8 +71,16 @@ public class AccountService {
         Account inAcc = accountRepository.findById(request.getInAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
 
+        // 해지된 계좌 예외처리
+        checkAccStatus(inAcc);
+        // 유효하지 않은 이체 금액 예외처리
         if (request.getAmount() < 0) {
             throw new CustomException(INVALID_TRANSFER_AMOUNT);
+        }
+        // 이체한도 예외처리
+        // 사용자 일일 이체한도 예외처리 (개발 예정)
+        if (outAcc.getAccTrsfLimit() < request.getAmount()) {
+            throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
         }
 
         // 트랜잭션 시작
@@ -108,6 +114,12 @@ public class AccountService {
         outAcc.transfer(-money);
         // 입금
         inAcc.transfer(money);
+    }
+
+    private void checkAccStatus(Account acc) {
+        if (acc.getStatus() == AccStatus.DELETED) {
+            throw new CustomException(ACCOUNT_NOT_FOUND);
+        }
     }
 }
 
