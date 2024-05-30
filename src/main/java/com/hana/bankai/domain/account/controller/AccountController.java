@@ -49,13 +49,19 @@ public class AccountController {
 
     @Operation(summary = "거래내역 조회")
     @GetMapping("/history")
-    public ApiResponse<List<AccountResponseDto.getAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request) {
+    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request) {
         return accountService.getAccHis(request);
     }
 
     @Operation(summary = "사용자 보유 계좌 조회")
     @GetMapping("/list")
-    public ApiResponse<List<AccountResponseDto.getAccInfo>> getAccList() {
+    public ApiResponse<List<AccountResponseDto.GetAccInfo>> getAccList() {
         return accountService.getAccList();
+    }
+
+    @Operation(summary = "사용자 총 자산 조회")
+    @GetMapping("/assets")
+    public ApiResponse<AccountResponseDto.GetAssets> getAssests() {
+        return accountService.getAssets();
     }
 }

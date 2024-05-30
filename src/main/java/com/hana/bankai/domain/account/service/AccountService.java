@@ -119,11 +119,11 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_TRANSFER_SUCCESS);
     }
 
-    public ApiResponse<List<AccountResponseDto.getAccHis>> getAccHis(AccountRequestDto.AccCodeReq request) {
+    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(AccountRequestDto.AccCodeReq request) {
         // 예외처리
         Account acc = getAccByAccCode(request.getAccCode());
 
-        List<AccountResponseDto.getAccHis> accHisList = new ArrayList<>();
+        List<AccountResponseDto.GetAccHis> accHisList = new ArrayList<>();
         try {
             // 입금
             List<AccountHistory> accHisDepositList = accHisRepository.findByInAccCodeAndInBankCode(acc.getAccCode(), BankCode.C04);
@@ -136,23 +136,38 @@ public class AccountService {
             throw new CustomException(FIND_ACCOUNT_HISTORY_FAIL);
         }
 
-        return ApiResponse.success(FIND_ACCOUNT_HISTORY_SUCCESS, accHisList);
+        return ApiResponse.success(ACCOUNT_HISTORY_CHECK_SUCCESS, accHisList);
     }
 
-    public ApiResponse<List<AccountResponseDto.getAccInfo>> getAccList() {
+    public ApiResponse<List<AccountResponseDto.GetAccInfo>> getAccList() {
         // 로그인한 사용자 정보 불러오기 (개발 예정)
         // 테스트용
         String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
         UUID userCode = UUID.fromString(uuidString);
 
-        List<AccountResponseDto.getAccInfo> accInfoList = new ArrayList<>();
+        List<AccountResponseDto.GetAccInfo> accInfoList = new ArrayList<>();
 
         User user = getUserByUserCode(userCode);
         for (Account acc : user.getAccountList()) {
-            accInfoList.add(AccountResponseDto.getAccInfo.from(acc));
+            accInfoList.add(AccountResponseDto.GetAccInfo.from(acc));
         }
 
-        return ApiResponse.success(FIND_ACCOUNT_LIST_SUCCESS, accInfoList);
+        return ApiResponse.success(ACCOUNT_LIST_CHECK_SUCCESS, accInfoList);
+    }
+
+    public ApiResponse<AccountResponseDto.GetAssets> getAssets() {
+        // 로그인한 사용자 정보 불러오기 (개발 예정)
+        // 테스트용
+        String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
+        UUID userCode = UUID.fromString(uuidString);
+        User user = getUserByUserCode(userCode);
+
+        Long assets = 0L;
+        for (Account acc : user.getAccountList()) {
+            assets += acc.getAccBalance();
+        }
+
+        return ApiResponse.success(USER_ASSETS_CHECK_SUCCESS, new AccountResponseDto.GetAssets(assets));
     }
 
     private Account getAccByAccCode(String accCode) {
@@ -182,8 +197,8 @@ public class AccountService {
         }
     }
 
-    private List<AccountResponseDto.getAccHis> makeAccHisDataList(List<AccountHistory> accHisList, boolean isDeposit) {
-        List<AccountResponseDto.getAccHis> accHisDataList = new ArrayList<>();
+    private List<AccountResponseDto.GetAccHis> makeAccHisDataList(List<AccountHistory> accHisList, boolean isDeposit) {
+        List<AccountResponseDto.GetAccHis> accHisDataList = new ArrayList<>();
 
         for (AccountHistory accHisReq : accHisList) {
             String targetAccCode = isDeposit ? accHisReq.getOutAccCode() : accHisReq.getInAccCode();
@@ -193,7 +208,7 @@ public class AccountService {
             Long hisAmount = isDeposit ? accHisReq.getHisAmount() : -accHisReq.getHisAmount();
             Long balance = isDeposit ? accHisReq.getAfterInBal() : accHisReq.getAfterOutBal();
 
-            accHisDataList.add(AccountResponseDto.getAccHis.from(accHisReq, targetUser.getUserName(), hisAmount, balance));
+            accHisDataList.add(AccountResponseDto.GetAccHis.from(accHisReq, targetUser.getUserName(), hisAmount, balance));
         }
 
         return accHisDataList;

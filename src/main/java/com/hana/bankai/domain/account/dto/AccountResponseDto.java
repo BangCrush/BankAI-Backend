@@ -36,15 +36,15 @@ public class AccountResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     @Builder
-    public static class getAccHis {
+    public static class GetAccHis {
         private LocalDateTime hisDateTime;
         private HisType hisType;
         private String target;
         private Long hisAmount;
         private Long balance;
 
-        public static getAccHis from(AccountHistory accHis, String target, Long hisAmount, Long balance) {
-            return getAccHis.builder()
+        public static GetAccHis from(AccountHistory accHis, String target, Long hisAmount, Long balance) {
+            return GetAccHis.builder()
                     .hisDateTime(accHis.getHisDateTime())
                     .hisType(accHis.getHisType())
                     .target(target)
@@ -58,19 +58,26 @@ public class AccountResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     @Builder
-    public static class getAccInfo {
+    public static class GetAccInfo {
         private String accCode;
         private Long accBalance;
         private String prodName;
         private ProdType prodType;
 
-        public static getAccInfo from(Account acc) {
-            return getAccInfo.builder()
+        public static GetAccInfo from(Account acc) {
+            return GetAccInfo.builder()
                     .accCode(acc.getAccCode())
                     .accBalance(acc.getAccBalance())
                     .prodName(acc.getProduct().getProdName())
                     .prodType(acc.getProduct().getProdType())
                     .build();
         }
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class GetAssets {
+        private Long assets;
     }
 }
