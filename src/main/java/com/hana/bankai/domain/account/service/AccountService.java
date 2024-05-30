@@ -139,6 +139,22 @@ public class AccountService {
         return ApiResponse.success(FIND_ACCOUNT_HISTORY_SUCCESS, accHisList);
     }
 
+    public ApiResponse<List<AccountResponseDto.getAccInfo>> getAccList() {
+        // 로그인한 사용자 정보 불러오기 (개발 예정)
+        // 테스트용
+        String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
+        UUID userCode = UUID.fromString(uuidString);
+
+        List<AccountResponseDto.getAccInfo> accInfoList = new ArrayList<>();
+
+        User user = getUserByUserCode(userCode);
+        for (Account acc : user.getAccountList()) {
+            accInfoList.add(AccountResponseDto.getAccInfo.from(acc));
+        }
+
+        return ApiResponse.success(FIND_ACCOUNT_LIST_SUCCESS, accInfoList);
+    }
+
     private Account getAccByAccCode(String accCode) {
         return accountRepository.findById(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
@@ -172,8 +188,7 @@ public class AccountService {
         for (AccountHistory accHisReq : accHisList) {
             String targetAccCode = isDeposit ? accHisReq.getOutAccCode() : accHisReq.getInAccCode();
             Account targetAcc = getAccByAccCode(targetAccCode);
-            User targetUser = userRepository.findById(targetAcc.getUser().getUserCode())
-                    .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+            User targetUser = getUserByUserCode(targetAcc.getUser().getUserCode());
 
             Long hisAmount = isDeposit ? accHisReq.getHisAmount() : -accHisReq.getHisAmount();
             Long balance = isDeposit ? accHisReq.getAfterInBal() : accHisReq.getAfterOutBal();
@@ -190,6 +205,11 @@ public class AccountService {
         }
 
         return accHisDataList;
+    }
+
+    private User getUserByUserCode(UUID userCode) {
+        return userRepository.findById(userCode)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 }
 

@@ -52,4 +52,10 @@ public class AccountController {
     public ApiResponse<List<AccountResponseDto.getAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request) {
         return accountService.getAccHis(request);
     }
+
+    @Operation(summary = "사용자 보유 계좌 조회")
+    @GetMapping("/list")
+    public ApiResponse<List<AccountResponseDto.getAccInfo>> getAccList() {
+        return accountService.getAccList();
+    }
 }
