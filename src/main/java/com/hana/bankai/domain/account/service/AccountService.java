@@ -5,6 +5,7 @@ import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccStatus;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
+import com.hana.bankai.global.aop.DistributedLock;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,7 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_PWD_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isPwdValid));
     }
 
+    @DistributedLock(key = "#request.getOutAccCode()")
     public ApiResponse transfer(AccountRequestDto.Transfer request) {
         // 사용자 인증 확인 (개발 예정)
 
