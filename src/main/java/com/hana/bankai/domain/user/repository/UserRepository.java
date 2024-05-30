@@ -2,6 +2,7 @@ package com.hana.bankai.domain.user.repository;
 
 import com.hana.bankai.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -22,13 +23,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // 중복 ID 확인
     Boolean existsByUserId(String userId);
 
-    // 로그인 정보 계정 존재 여부 확인
-    Boolean existsByUserIdAndUserPwd(String userId, String userPwd);
-
     // 아이디 조회
-    Optional<User> findByUserNameKrAndUserEmail(String userNameKr, String userEmail);
+    @Query("select u.userId from user u where u.userNameKr = :userNameKr and u.userEmail = :userEmail")
+    Optional<String> findUserIdByUserNameKrAndUserEmail(String userNameKr, String userEmail);
 
     // 비밀번호 조회
-    Optional<User> findByUserNameKrAndUserIdAndUserEmail(String userNameKr, String userId, String userEmail);
+    @Query("select u.userPwd from user u where u.userNameKr = :userNameKr and u.userId = :userId and u.userEmail = :userEmail")
+    Optional<String> findUserPwdByUserNameKrAndUserIdAndUserEmail(String userNameKr, String userId, String userEmail);
 
 }

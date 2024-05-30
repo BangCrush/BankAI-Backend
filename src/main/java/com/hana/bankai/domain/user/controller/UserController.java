@@ -54,8 +54,20 @@ public class UserController {
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public ApiResponse<UserResponseDto.TokenInfo> login(@RequestBody UserRequestDto.Login login) {
-        return userService.login(login);
+    public ApiResponse<UserResponseDto.TokenInfo> login(@RequestBody UserRequestDto.Login request) {
+        return userService.login(request);
+    }
+
+    @Operation(summary = "아이디 찾기")
+    @PostMapping("/login/find-id")
+    public ApiResponse<UserResponseDto.LoginFindId> loginFindId(@RequestBody UserRequestDto.LoginFindId request) {
+        return userService.loginFindId(request);
+    }
+
+    @Operation(summary = "비밀번호 찾기")
+    @PostMapping("/login/find-pwd")
+    public ApiResponse<UserResponseDto.LoginFindPwd> loginFindId(@RequestBody UserRequestDto.LoginFindPwd request) {
+        return userService.loginFindPwd(request);
     }
 
 }

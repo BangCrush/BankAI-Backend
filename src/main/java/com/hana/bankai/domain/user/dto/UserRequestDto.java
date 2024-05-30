@@ -97,7 +97,7 @@ public class UserRequestDto {
     // 아이디 찾기
     public static class LoginFindId {
         @NotEmpty(message = "이름을 입력하세요.")
-        private String userName;
+        private String userNameKr;
 
         @NotEmpty(message = "이메일을 입력하세요.")
         private String userEmail;
@@ -108,7 +108,7 @@ public class UserRequestDto {
     // 비밀번호 찾기
     public static class LoginFindPwd {
         @NotEmpty(message = "이름을 입력하세요.")
-        private String userName;
+        private String userNameKr;
 
         @NotEmpty(message = "아이디를 입력하세요.")
         private String userId;

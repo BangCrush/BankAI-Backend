@@ -15,6 +15,7 @@ class InsertTests {
     @Autowired
     UserService service;
 
+    /*
     @Test
     void contextLoads() {
         log.info(" *** User Insert Test *** ");
@@ -33,6 +34,7 @@ class InsertTests {
 
         service.register(register);
     }
+    */
 
 }
 

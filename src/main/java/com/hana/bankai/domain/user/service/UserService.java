@@ -53,21 +53,6 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND.getMessage()));
     }
 
-    // ex. 소연 예시 코드
-//    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
-//        Account account = accountRepository.findById(request.getAccCode())
-//                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-//
-//        // 해지된 계좌인지 확인
-//        if (account.getStatus() == AccStatus.DELETED) {
-//            throw new CustomException(ACCOUNT_NOT_FOUND);
-//        }
-//
-//        String userName = account.getUser().getUserName();
-//        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
-//    }
-
-
     // 회원가입 여부 확인
     public ApiResponse<UserResponseDto.RegisterDuplicateCheck> registerCheck(UserRequestDto.RegisterCheck request) {
         // return value. 계정이 이미 존재하면 true, 아니면 false 반환
@@ -127,40 +112,50 @@ public class UserService implements UserDetailsService {
         return ApiResponse.success(USER_REGISTER_SUCCESS);
     }
 
-
+    // 로그인
     public ApiResponse<UserResponseDto.TokenInfo> login(UserRequestDto.Login login) {
-        // 로그인 아이디, 비밀번호 기준으로 로그인 정보 계정 조회
-        log.info("********** " + login.getUserId() + " " + login.getUserPwd());
+        // 로그인 정보 계정 조회
         if(userRepository.findByUserId(login.getUserId()).orElse(null) == null) {
             throw new CustomException(USER_NOT_FOUND);
         }
 
-        log.info("### 0번 ###");
         // 1. 로그인 아이디, 비밀번호를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken = login.toAuthentication();
         // authenticationToken 내에는 id, pwd 들어가 있다
-        log.info("### 1번 ###");
 
         // 2. 실제 검증(사용자 비밀번호 체크)이 이루어지는 부분
         // authenticate 함수가 실행될 때 loadUserByUsername 함수 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         // authenticationManagerBuilder -> id, pwd 일치 여부 판단
         // authentication -> 권한 정보 저장
-        log.info("### 2번 ###");
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         UserResponseDto.TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
-        log.info("### 3번 ###");
 
-        // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
         log.info("RT: " + authentication.getName() + " : " + tokenInfo.getRefreshToken() + " : " + tokenInfo.getRefreshTokenExpirationTime() + " : " + TimeUnit.MILLISECONDS);
 
+        // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-        log.info("### 5번 ###");
 
         return ApiResponse.success(USER_LOGIN_SUCCESS, tokenInfo);
+    }
+
+    // 아이디 조회
+    public ApiResponse<UserResponseDto.LoginFindId> loginFindId(UserRequestDto.LoginFindId request) {
+        String userId = userRepository.findUserIdByUserNameKrAndUserEmail(request.getUserNameKr(), request.getUserEmail())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        return ApiResponse.success(USER_FIND_ID_SUCCESS, new UserResponseDto.LoginFindId(userId));
+    }
+
+    // 비밀번호 조회
+    public ApiResponse<UserResponseDto.LoginFindPwd> loginFindPwd(UserRequestDto.LoginFindPwd request) {
+        String userPwd = userRepository.findUserPwdByUserNameKrAndUserIdAndUserEmail(request.getUserNameKr(), request.getUserId(), request.getUserEmail())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        return ApiResponse.success(USER_FIND_ID_SUCCESS, new UserResponseDto.LoginFindPwd(userPwd));
     }
 
     /*

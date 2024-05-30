@@ -36,9 +36,7 @@ public class UserResponseDto {
     @AllArgsConstructor
     // 비밀번호 찾기
     public static class LoginFindPwd {
-        private String userName;
-        private String userId;
-        private String userEmail;
+        private String userPwd;
     }
 
 }
