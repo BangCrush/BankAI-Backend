@@ -5,6 +5,7 @@ import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccStatus;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
+import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.global.aop.DistributedLock;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
@@ -15,6 +16,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import static com.hana.bankai.domain.accounthistory.entity.HisType.*;
 import static com.hana.bankai.global.common.response.SuccessCode.*;
 import static com.hana.bankai.global.error.ErrorCode.*;
 
@@ -24,6 +26,7 @@ import static com.hana.bankai.global.error.ErrorCode.*;
 public class AccountService {
 
     final private AccountRepository accountRepository;
+    final private AccHisService accHisService;
     final PlatformTransactionManager transactionManager;
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(AccountRequestDto.AccCodeReq request) {
@@ -88,6 +91,8 @@ public class AccountService {
         try {
             bizLogic(outAcc, inAcc, request.getAmount());
             transactionManager.commit(status); // 성공 시 커밋
+            // 계좌 로그 생성
+            accHisService.createAccHis(request.getAmount(), TRANSFER, inAcc, outAcc);
         } catch (CustomException e) {
             if (e.getErrorCode().getCode().equals("E201")) {
                 throw e;
