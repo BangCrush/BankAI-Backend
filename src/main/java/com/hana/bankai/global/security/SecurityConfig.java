@@ -1,7 +1,7 @@
 package com.hana.bankai.global.security;
 
-//import com.hana.bankai.global.security.jwt.JwtAuthenticationFilter;
-//import com.hana.bankai.global.security.jwt.JwtTokenProvider;
+import com.hana.bankai.global.security.jwt.JwtAuthenticationFilter;
+import com.hana.bankai.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +37,7 @@ public class SecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwtTokenProvider) throws Exception {
         // CSRF, CORS 해제
         http.csrf((csrf) -> csrf.disable());
         http.cors(Customizer.withDefaults());
@@ -51,7 +51,7 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         // JwtAuthFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
-//        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
 //        http.exceptionHandling((exceptionHandling) -> exceptionHandling
 //                .authenticationEntryPoint(authenticationEntryPoint)
@@ -61,7 +61,7 @@ public class SecurityConfig {
         // 권한 규칙 작성
         http.authorizeHttpRequests(authorize -> authorize
 //                        .requestMatchers(AUTH_WHITELIST).permitAll()
-//                        @PreAuthrization을 사용할 것이기 때문에 모든 경로에 대한 인증처리는 Pass
+                        // cf. @PreAuthrization을 사용할 것이기 때문에 위의 모든 경로에 대한 인증처리는 Pass
                         .anyRequest().permitAll()
 //                        .anyRequest().authenticated()
         );

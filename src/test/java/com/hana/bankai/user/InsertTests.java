@@ -22,7 +22,7 @@ class InsertTests {
         UserRequestDto.Register register = UserRequestDto.Register.builder()
                 .userId("user02")
                 .userPwd("1111")
-                .userName("홍길동")
+                .userNameKr("홍길동")
                 .userInherentNumber("901234-1234568")
                 .userPhone("010-1234-1234")
                 .userAddr("대한민국")

@@ -16,7 +16,7 @@ public class UserResponseDto {
     @Builder
     @Getter
     @AllArgsConstructor
-    public static class Login {
+    public static class TokenInfo {
         private String grantType;
         private String accessToken;
         private String refreshToken;
@@ -39,17 +39,6 @@ public class UserResponseDto {
         private String userName;
         private String userId;
         private String userEmail;
-    }
-
-    // !! 임시 코드. 추후 삭제 예정
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    public static class TokenInfo {
-        private String grantType;
-        private String accessToken;
-        private String refreshToken;
-        private Long refreshTokenExpirationTime;
     }
 
 }

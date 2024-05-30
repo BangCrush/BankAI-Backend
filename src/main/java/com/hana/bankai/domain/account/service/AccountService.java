@@ -39,7 +39,7 @@ public class AccountService {
             throw new CustomException(ACCOUNT_NOT_FOUND);
         }
 
-        String userName = account.getUser().getUserName();
+        String userName = account.getUser().getUserNameKr();
         return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
     }
 

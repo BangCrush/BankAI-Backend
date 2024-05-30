@@ -7,11 +7,12 @@ import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
 import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
+import com.hana.bankai.domain.user.entity.Role;
 import com.hana.bankai.domain.user.entity.User;
 import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
-//import com.hana.bankai.global.security.jwt.JwtTokenProvider;
+import com.hana.bankai.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,11 +21,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static com.hana.bankai.global.common.response.SuccessCode.*;
@@ -34,31 +39,33 @@ import static com.hana.bankai.global.error.ErrorCode.*;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class UserService {
-
-    private final AccountRepository accountRepository;
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-//    private final Response response;
     private final BCryptPasswordEncoder passwordEncoder;
-//    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisTemplate redisTemplate;
 
+    @Override
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND.getMessage()));
+    }
 
     // ex. 소연 예시 코드
-    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
-        Account account = accountRepository.findById(request.getAccCode())
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-
-        // 해지된 계좌인지 확인
-        if (account.getStatus() == AccStatus.DELETED) {
-            throw new CustomException(ACCOUNT_NOT_FOUND);
-        }
-
-        String userName = account.getUser().getUserName();
-        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
-    }
+//    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
+//        Account account = accountRepository.findById(request.getAccCode())
+//                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+//
+//        // 해지된 계좌인지 확인
+//        if (account.getStatus() == AccStatus.DELETED) {
+//            throw new CustomException(ACCOUNT_NOT_FOUND);
+//        }
+//
+//        String userName = account.getUser().getUserName();
+//        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
+//    }
 
 
     // 회원가입 여부 확인
@@ -102,14 +109,15 @@ public class UserService {
         // RequestDto to Entity
         User user = User.builder()
                 .userId(register.getUserId())
-                .userPwd(register.getUserPwd())
-                .userName(register.getUserName())
+                .userPwd(passwordEncoder.encode(register.getUserPwd()))
+                .userNameKr(register.getUserNameKr())
                 .userInherentNumber(register.getUserInherentNumber())
                 .userPhone(register.getUserPhone())
                 .userAddr(register.getUserAddr())
                 .userAddrDetail(register.getUserAddrDetail())
                 .userNameEn(register.getUserNameEn())
                 .userEmail(register.getUserEmail())
+                .roles(Collections.singletonList(Role.ROLE_USER.name()))
                 .build();
 
         // DB 저장
@@ -119,36 +127,43 @@ public class UserService {
         return ApiResponse.success(USER_REGISTER_SUCCESS);
     }
 
-    /*
-    public ResponseEntity<?> login(UserRequestDto.Login login) {
 
-        if (usersRepository.findByEmail(login.getEmail()).orElse(null) == null) {
-            return response.fail("해당하는 유저가 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
+    public ApiResponse<UserResponseDto.TokenInfo> login(UserRequestDto.Login login) {
+        // 로그인 아이디, 비밀번호 기준으로 로그인 정보 계정 조회
+        log.info("********** " + login.getUserId() + " " + login.getUserPwd());
+        if(userRepository.findByUserId(login.getUserId()).orElse(null) == null) {
+            throw new CustomException(USER_NOT_FOUND);
         }
 
-        // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
+        log.info("### 0번 ###");
+        // 1. 로그인 아이디, 비밀번호를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
         UsernamePasswordAuthenticationToken authenticationToken = login.toAuthentication();
-        // authenticationToken 내에는 id, pw 들어가있다
+        // authenticationToken 내에는 id, pwd 들어가 있다
+        log.info("### 1번 ###");
 
-        // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
-        // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
+        // 2. 실제 검증(사용자 비밀번호 체크)이 이루어지는 부분
+        // authenticate 함수가 실행될 때 loadUserByUsername 함수 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        // authenticationManagerBuilder -> id, pw 일치 여부 판단
+        // authenticationManagerBuilder -> id, pwd 일치 여부 판단
         // authentication -> 권한 정보 저장
+        log.info("### 2번 ###");
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         UserResponseDto.TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+        log.info("### 3번 ###");
 
         // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
-        log.info("RT:" + authentication.getName() + " : " + tokenInfo.getRefreshToken() + " : " + tokenInfo.getRefreshTokenExpirationTime() + " : " + TimeUnit.MILLISECONDS);
-
+        log.info("RT: " + authentication.getName() + " : " + tokenInfo.getRefreshToken() + " : " + tokenInfo.getRefreshTokenExpirationTime() + " : " + TimeUnit.MILLISECONDS);
 
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        log.info("### 5번 ###");
 
-        return response.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
+        return ApiResponse.success(USER_LOGIN_SUCCESS, tokenInfo);
     }
+
+    /*
 
     public ResponseEntity<?> reissue(UserRequestDto.Reissue reissue) {
         // 1. Refresh Token 검증
@@ -202,6 +217,6 @@ public class UserService {
 
         return response.success("로그아웃 되었습니다.");
     }
-    */
 
+    */
 }
