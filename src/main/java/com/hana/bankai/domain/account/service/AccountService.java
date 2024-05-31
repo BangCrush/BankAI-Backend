@@ -16,6 +16,8 @@ import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -45,6 +47,7 @@ public class AccountService {
     final PlatformTransactionManager transactionManager;
     private final AccCodeGenerator accCodeGenerator;
     private final ProductRepository productRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
@@ -199,8 +202,7 @@ public class AccountService {
     public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request,
                                                   String userId){
         // 회원 이체한도 보다 많을 수 없음 체크
-        User checkUser = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User checkUser = getUserByUserId(userId);
         Long limit = userRepository.getUserLimit(checkUser.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         if (request.getAccTrsfLimit() > limit) {
@@ -222,7 +224,7 @@ public class AccountService {
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        return accPwdCheck.equals(accPwd);
+        return passwordEncoder.matches(accPwd, accPwdCheck);
     }
 
     private User getUserByUserId(String userId) {
