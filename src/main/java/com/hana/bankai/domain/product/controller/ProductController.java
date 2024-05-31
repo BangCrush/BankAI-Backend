@@ -42,9 +42,9 @@ public class ProductController {
     public ApiResponse<ProductResponseDto.GetProductDetail> detailProd(@RequestParam("code") Long productCode) {
         return productService.getProductDetail(productCode);
     }
-
-
-
-
-
+    @Operation(summary = "상품 TOP 3 조회")
+    @GetMapping("/top-three")
+    public ApiResponse<List<ProductResponseDto.GetTopThree>> getProdTopThree() {
+        return productService.prodTopThree();
+    }
 }

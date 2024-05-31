@@ -21,6 +21,8 @@ public enum ErrorCode {
     ACCOUNT_TRANSFER_FAIL("E203", "계좌이체 실패"),
     TRANSFER_LIMIT_EXCEEDED("E204", "이체한도 초과"),
     FIND_ACCOUNT_HISTORY_FAIL("E205", "거래내역 조회 실패"),
+    LIMIT_MODIFY_FAIL("E206","이체 한도 수정 실패: 이체 한도가 일일 한도보다 큽니다"),
+    ACCOUNT_PWD_FAIL("E207","계좌 비밀번호가 다릅니다"),
 
     // Redis
     LOCK_NOT_AVAILABLE("E400", "사용할 수 없는 락"),

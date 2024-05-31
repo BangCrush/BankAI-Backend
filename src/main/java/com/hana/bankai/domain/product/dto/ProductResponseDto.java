@@ -16,7 +16,7 @@ public class ProductResponseDto {
         private String prodName;
         private String prodPromo;
         private String joinMember;
-        private String prodRate;
+        private double prodRate;
         private Long prodLimit;
     }
     @Getter
@@ -40,6 +40,19 @@ public class ProductResponseDto {
         private ProdAcc prodAcc;
         private String prodPromo;
         private String prodTerms;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class GetTopThree {
+        private Long prodCode;
+        private String prodName;
+        private int joinPeriod;
+        private double prodRate;
+        private Long prodLimit;
+        private String prodDesc;
     }
 
 }

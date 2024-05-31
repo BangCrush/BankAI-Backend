@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,4 +30,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // 비밀번호 조회
     @Query("select u.userPwd from user u where u.userNameKr = :userNameKr and u.userId = :userId and u.userEmail = :userEmail")
     Optional<String> findUserPwdByUserNameKrAndUserIdAndUserEmail(String userNameKr, String userId, String userEmail);
+
+    // 비밀번호 찾기
+    Optional<User> findByUserNameKrAndUserIdAndUserEmail(String userNameKr, String userId, String userEmail);
+
+    // 유저 일일 계좌 이체 한도 찾기
+    @Query("select utl.dailyLimit from  user_trsf_limit utl where utl.user.userId =:userId")
+    Optional<Long> getUserLimit(String userId);
+
 }

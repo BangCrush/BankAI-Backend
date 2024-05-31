@@ -7,6 +7,7 @@ import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/account")
+@Slf4j
 public class AccountController {
 
     private final AccountService accountService;
@@ -68,4 +70,24 @@ public class AccountController {
     public ApiResponse<AccountResponseDto.GetAssets> getAssests(@AuthenticationPrincipal UserDetails user) {
         return accountService.getAssets(user.getUsername());
     }
+
+    @Operation(summary = "계좌 생성")
+    @PostMapping("/opening")
+    public ApiResponse<AccountResponseDto.JoinAcc> openAcc(@RequestBody AccountRequestDto.ProdJoinReq request) {
+        return accountService.joinAcc(request);
+    }
+
+    @Operation(summary = "계좌 해지")
+    @DeleteMapping("/closing")
+    public ApiResponse<Object> closeAcc(@RequestBody AccountRequestDto.CheckAccPwd request) {
+        return accountService.terminationAcc(request);
+    }
+
+    @Operation(summary = "계좌 이체 한도 수정")
+    @PutMapping("/update-limit")
+    public ApiResponse<Object> modifyTrsfLimitAcc(@RequestBody AccountRequestDto.TrsfLimitModify request,
+                                                  @AuthenticationPrincipal UserDetails user) {
+        return accountService.accTrsfLimitModify(request, user.getUsername());
+    }
+
 }
