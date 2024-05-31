@@ -6,9 +6,10 @@ import java.util.Arrays;
 
 @Getter
 public enum ProdType {
-    DEPOSIT("예금",1),
-    SAVINGS("적금",2),
-    LOAN("대출",3);
+    CHECKING("입출금",1),
+    DEPOSIT("예금",2),
+    SAVINGS("적금",3),
+    LOAN("대출",4);
 
     private final String desc;
     private final int code;
