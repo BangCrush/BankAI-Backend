@@ -1,21 +1,21 @@
 package com.hana.bankai.domain.account.entity;
 
+import com.hana.bankai.domain.account.repository.AccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
 
-public class AccCodeGenerator implements IdentifierGenerator {
+@RequiredArgsConstructor
+@Component
+public class AccCodeGenerator{
 
     private static final SecureRandom random = new SecureRandom();
 
-    @Override
-    public Serializable generate(SharedSessionContractImplementor session, Object object) {
-        return generateAccCode();
-    }
-
-    private String generateAccCode() {
+    public String generateAccCode() {
         StringBuilder accCode = new StringBuilder(16);
         accCode.append("04-");
         for (int i = 0; i < 5; i ++) {

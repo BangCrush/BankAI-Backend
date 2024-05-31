@@ -80,4 +80,10 @@ public class AccountResponseDto {
     public static class GetAssets {
         private Long assets;
     }
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class JoinAcc {
+        private String accCode;
+    }
 }
