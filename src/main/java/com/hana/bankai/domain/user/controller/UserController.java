@@ -2,6 +2,7 @@ package com.hana.bankai.domain.user.controller;
 
 import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
+import com.hana.bankai.domain.user.service.MailService;
 import com.hana.bankai.domain.user.service.UserService;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
@@ -22,6 +23,7 @@ import static com.hana.bankai.global.error.ErrorCode.USER_REGISTER_VALIDATION_FA
 public class UserController {
 
     private final UserService userService;
+    private final MailService mailService;
 
     /* register */
 
@@ -106,6 +108,12 @@ public class UserController {
     @PutMapping("/users/job-info")
     public ApiResponse<Object> updateUserJobInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UserRequestDto.UserJobInfo userJobInfo) {
         return userService.updateUserJobInfo(userDetails.getUsername(), userJobInfo);
+    }
+
+    @Operation(summary = "이메일 인증")
+    @PostMapping("/register/authenticate")
+    public ApiResponse<String> AuthenticateEmail(@RequestParam("email") String email) {
+        return mailService.authenticateEmail(email);
     }
 
 }

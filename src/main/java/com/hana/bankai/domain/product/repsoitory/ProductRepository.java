@@ -13,7 +13,11 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-//    @Query("select p from product p where p.prodType = :prodType")
-//    Optional<ProductResponseDto.GetProduct> findProdByProdType(@Param("ProdType") String prodType);
+
     List<Product> findByProdType(ProdType prodtype);
+
+    @Query("SELECT p FROM product p WHERE p.prodCode IN :prodCodes")
+    List<Product> findByProdCodes(@Param("prodCodes") List<Long> prodCodes);
+
+
 }

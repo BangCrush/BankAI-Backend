@@ -28,8 +28,8 @@ import java.util.List;
 public class Account {
 
     @Id
-    @GeneratedValue(generator = "acc-code-generator")
-    @GenericGenerator(name = "acc-code-generator", strategy = "com.hana.bankai.domain.account.entity.AccCodeGenerator")
+//    @GeneratedValue(generator = "acc-code-generator")
+//    @GenericGenerator(name = "acc-code-generator", strategy = "com.hana.bankai.domain.account.entity.AccCodeGenerator")
     private String accCode;
 
     @ManyToOne
@@ -49,6 +49,7 @@ public class Account {
     @Column
     @ColumnDefault("0")
     @Builder.Default()
+    @Setter
     private Long accBalance = 0L;
 
     @CreatedDate
@@ -56,9 +57,10 @@ public class Account {
     private LocalDate accJoinDate;
 
     @Column
-    @ColumnDefault("500000")
+    @ColumnDefault("5000000000")
     @Builder.Default()
-    private Long accTrsfLimit = 500000L;
+    @Setter
+    private Long accTrsfLimit = 5000000000L;
 
     @Column
     @NotNull
@@ -66,6 +68,7 @@ public class Account {
 
     @Column
     @Builder.Default()
+    @Setter
     private AccStatus status = AccStatus.valueOf("ACTIVE");
 
     @OneToMany(mappedBy = "account") // One(account) to Many(autotransfer)
