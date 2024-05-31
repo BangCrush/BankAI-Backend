@@ -13,7 +13,11 @@ public enum ErrorCode {
     USER_LOGOUT_ACCESS_TOKEN_VALIDATION_FAIL("E103", "잘못된 요청입니다."),
     USER_TRSF_LIMIT_NOT_FOUND("E104", "사용자 일일 이체 한도 조회 불가"),
     USER_AUTHENTICATION_FAIL("E105", "사용자 인증 실패"),
-    SEND_EMAIL_CODE_FAIL("E106", "이메일 인증 코드 전송 실패"),
+    USER_GET_INFO_FAIL("E106", "회원 정보 조회 실패"),
+    USER_UPDATE_INFO_FAIL("E107", "회원 정보 수정 실패"),
+    USER_GET_JOB_INFO_FAIL("E108", "직업 정보 조회 실패"),
+    USER_UPDATE_JOB_INFO_FAIL("E109", "직업 정보 수정 실패"),
+    SEND_EMAIL_CODE_FAIL("E110", "이메일 인증 코드 전송 실패"),
 
     // Account
     ACCOUNT_NOT_FOUND("E200", "존재하지 않는 계좌입니다."),

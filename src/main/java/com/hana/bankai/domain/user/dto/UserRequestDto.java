@@ -4,29 +4,28 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 public class UserRequestDto {
 
     /* register */
 
-    @Getter
     // 회원가입 여부 확인
+    @Getter
     public static class RegisterCheck {
         @NotEmpty(message = "주민등록번호는 필수 입력값입니다.")
         private String userInherentNumber;
     }
 
-    @Getter
     // 중복 이메일 확인
+    @Getter
     public static class RegisterCheckEmail {
         @NotEmpty(message = "이메일는 필수 입력값입니다.")
         private String userEmail;
     }
 
-    @Getter
     // 중복 ID 확인
+    @Getter
     public static class RegisterCheckId {
         @NotEmpty(message = "아이디는 필수 입력값입니다.")
         private String userId;
@@ -63,7 +62,6 @@ public class UserRequestDto {
 
         @NotEmpty(message = "상세주소를 입력하세요.")
         private String userAddrDetail;
-
     }
 
     /* login */
@@ -83,7 +81,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     public static class Reissue {
         @NotEmpty(message = "accessToken 을 입력해주세요.")
         private String accessToken;
@@ -93,8 +90,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
-    // 아이디 찾기
     public static class LoginFindId {
         @NotEmpty(message = "이름을 입력하세요.")
         private String userNameKr;
@@ -104,8 +99,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
-    // 비밀번호 찾기
     public static class LoginFindPwd {
         @NotEmpty(message = "이름을 입력하세요.")
         private String userNameKr;
@@ -118,13 +111,51 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     public static class Logout {
         @NotEmpty(message = "잘못된 요청입니다.")
         private String accessToken;
 
         @NotEmpty(message = "잘못된 요청입니다.")
         private String refreshToken;
+    }
+
+    @Getter
+    public static class UserInfo {
+        @NotEmpty(message = "비밀번호를 입력하세요.")
+        private String userPwd;
+
+        @NotEmpty(message = "이메일을 입력하세요.")
+        private String userEmail;
+
+        @NotEmpty(message = "휴대번호을 입력하세요.")
+        private String userPhone;
+
+        @NotEmpty(message = "주소를 입력하세요.")
+        private String userAddr;
+
+        @NotEmpty(message = "상세 주소를 입력하세요.")
+        private String userAddrDetail;
+
+        @NotEmpty(message = "일일 최대한도을 입력하세요.")
+        private Long userTrsfLimit;
+
+        @NotEmpty(message = "주 계좌를 입력하세요.")
+        private String userMainAcc;
+    }
+
+    @Getter
+    public static class UserJobInfo {
+        @NotEmpty(message = "직업명을 입력하세요.")
+        private String jobName;
+
+        @NotEmpty(message = "직장명을 입력하세요.")
+        private String companyName;
+
+        @NotEmpty(message = "직장 주소를 입력하세요.")
+        private String companyAddr;
+
+        @NotEmpty(message = "직장 연락처를 입력하세요.")
+        private String companyPhone;
     }
 
 }

@@ -8,12 +8,16 @@ import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.hana.bankai.global.error.ErrorCode.USER_REGISTER_VALIDATION_FAIL;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -80,9 +84,36 @@ public class UserController {
         return userService.logout(request);
     }
 
+    /* users */
+
+    @Operation(summary = "회원 정보 조회")
+    @GetMapping("/users/user-info")
+    public ApiResponse<UserResponseDto.UserInfo> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        return userService.getUserInfo(userDetails.getUsername());
+    }
+
+    @Operation(summary = "회원 정보 수정")
+    @PutMapping("/users/user-info")
+    public ApiResponse<Object> updateUserInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UserRequestDto.UserInfo userInfo) {
+        return userService.updateUserInfo(userDetails.getUsername(), userInfo);
+    }
+
+    @Operation(summary = "직업 정보 조회")
+    @GetMapping("/users/job-info")
+    public ApiResponse<UserResponseDto.UserJobInfo> getUserJobInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        return userService.getUserJobInfo(userDetails.getUsername());
+    }
+
+    @Operation(summary = "직업 정보 수정")
+    @PutMapping("/users/job-info")
+    public ApiResponse<Object> updateUserJobInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UserRequestDto.UserJobInfo userJobInfo) {
+        return userService.updateUserJobInfo(userDetails.getUsername(), userJobInfo);
+    }
+
     @Operation(summary = "이메일 인증")
     @PostMapping("/register/authenticate")
     public ApiResponse<String> AuthenticateEmail(@RequestParam("email") String email) {
         return mailService.authenticateEmail(email);
     }
+
 }
