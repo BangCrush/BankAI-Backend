@@ -2,26 +2,33 @@ package com.hana.bankai.domain.account.service;
 
 import com.hana.bankai.domain.account.dto.AccountRequestDto;
 import com.hana.bankai.domain.account.dto.AccountResponseDto;
-import com.hana.bankai.domain.account.entity.AccStatus;
+import com.hana.bankai.domain.account.entity.AccCodeGenerator;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
+import com.hana.bankai.domain.accounthistory.repository.AccHisRepository;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
+import com.hana.bankai.domain.product.repsoitory.ProductRepository;
 import com.hana.bankai.domain.user.entity.User;
 import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.service.UserTrsfLimitService;
 import com.hana.bankai.global.aop.DistributedLock;
+import com.hana.bankai.domain.product.entity.Product;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.hana.bankai.domain.account.entity.AccStatus.ACTIVE;
+import static com.hana.bankai.domain.account.entity.AccStatus.DELETED;
 import static com.hana.bankai.domain.accounthistory.entity.HisType.*;
 import static com.hana.bankai.global.common.response.SuccessCode.*;
 import static com.hana.bankai.global.error.ErrorCode.*;
@@ -29,6 +36,7 @@ import static com.hana.bankai.global.error.ErrorCode.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class AccountService {
 
     private final AccountRepository accountRepository;
@@ -36,6 +44,9 @@ public class AccountService {
     private final AccHisService accHisService;
     private final UserTrsfLimitService trsfLimitService;
     final PlatformTransactionManager transactionManager;
+    private final AccCodeGenerator accCodeGenerator;
+    private final ProductRepository productRepository;
+
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
         // 사용자 인증
@@ -53,7 +64,6 @@ public class AccountService {
 
         // 해지된 계좌인지 확인
         checkAccStatus(account);
-
         String userName = account.getUser().getUserNameKr();
         return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(accCode, userName));
     }
@@ -61,17 +71,12 @@ public class AccountService {
     public ApiResponse<AccountResponseDto.CheckRes> checkTransferLimit(AccountRequestDto.CheckTransferLimit request) {
         Long balance = accountRepository.findAccBalanceByAccCode(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-
         boolean isTransferAble = balance >= request.getAmount();
-
         return ApiResponse.success(ACCOUNT_LIMIT_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isTransferAble));
     }
 
     public ApiResponse<AccountResponseDto.CheckRes> checkAccPw(AccountRequestDto.CheckAccPwd request) {
-        String accPwd = accountRepository.findAccPwdByAccCode(request.getAccCode())
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-
-        boolean isPwdValid = accPwd.equals(request.getAccPwd());
+        boolean isPwdValid = checkAccountByAccPwd(request.getAccCode(),request.getAccPwd());
         return ApiResponse.success(ACCOUNT_PWD_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isPwdValid));
     }
 
@@ -128,6 +133,7 @@ public class AccountService {
     }
 
     public ApiResponse<AccountResponseDto.GetAssets> getAssets(String userId) {
+        // 로그인한 사용자 정보 불러오기 (개발 예정)
         User user = getUserByUserId(userId);
 
         Long assets = 0L;
@@ -136,16 +142,6 @@ public class AccountService {
         }
 
         return ApiResponse.success(USER_ASSETS_CHECK_SUCCESS, new AccountResponseDto.GetAssets(assets));
-    }
-
-    private Account getAccByAccCode(String accCode) {
-        return accountRepository.findById(accCode)
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-    }
-
-    private Long retrieveBalance(String accCode) {
-        return accountRepository.findAccBalanceByAccCode(accCode)
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
     }
 
     private void bizLogic(Account outAcc, Account inAcc, Long money) {
@@ -159,10 +155,75 @@ public class AccountService {
         inAcc.transfer(money);
     }
 
-    private void checkAccStatus(Account acc) {
-        if (acc.getStatus() == AccStatus.DELETED) {
-            throw new CustomException(ACCOUNT_NOT_FOUND);
+    //상품가입(계좌개설)
+    public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request) {
+
+        // User 객체 불러오기
+        User userEntity = userRepository.findById(request.getUserCode())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        // Product 객체 불러오기
+        Product productEntity = productRepository.findById(request.getProdCode())
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
+        LocalDate now = LocalDate.now();
+        // 계좌 생성 및 계좌번호 중복 체크
+        Account savedAccount;
+        String accCode;
+        do {
+            accCode = accCodeGenerator.generateAccCode();
+        } while (accountRepository.existsByAccCode(accCode));
+        savedAccount = Account.builder()
+                .accCode(accCode)
+                .user(userEntity)
+                .product(productEntity)
+                .accBalance(request.getAmount())
+                .accTrsfLimit(request.getAccTrsfLimit())
+                .accTime(now.plusMonths(request.getPeriod())) //plusMonths으로 만기일지정
+                .accPwd(request.getAccountPwd())
+                .status(ACTIVE)
+                .build();
+        accountRepository.save(savedAccount);
+
+        AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
+        return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
+    }
+
+    // 계좌해지
+    public ApiResponse<Object> terminationAcc(AccountRequestDto.CheckAccPwd request){
+        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+        account.setStatus(DELETED);
+        account.setAccBalance(0L);
+        return ApiResponse.success(ACCOUNT_DELETE_SUCCESS);
+    }
+
+    //이체한도 수정(각 계좌별)
+    public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request,
+                                                  String userId){
+        // 회원 이체한도 보다 많을 수 없음 체크
+        User checkUser = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        Long limit = userRepository.getUserLimit(checkUser.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        if (request.getAccTrsfLimit() > limit) {
+            throw new CustomException(LIMIT_MODIFY_FAIL);
         }
+        // 비밀번호 체크
+        if (checkAccountByAccPwd(request.getAccCode(),request.getAccPwd())){
+            throw new CustomException(ACCOUNT_PWD_FAIL);
+        };
+        // 이체한도 수정
+        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+        account.setAccTrsfLimit(request.getAccTrsfLimit());
+        return ApiResponse.success(ACCOUNT_LIMIT_MODIFY_SUCCESS);
+    }
+
+
+   // 중복 함수 분리
+    private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
+        String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+        return accPwdCheck.equals(accPwd);
     }
 
     private User getUserByUserId(String userId) {
@@ -175,5 +236,22 @@ public class AccountService {
             throw new CustomException(USER_AUTHENTICATION_FAIL);
         }
     }
+
+    private void checkAccStatus(Account acc) {
+        if (acc.getStatus() == DELETED) {
+            throw new CustomException(ACCOUNT_NOT_FOUND);
+        }
+    }
+
+    private Account getAccByAccCode(String accCode) {
+        return accountRepository.findById(accCode)
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+    }
+
+    private Long retrieveBalance(String accCode) {
+        return accountRepository.findAccBalanceByAccCode(accCode)
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+    }
+
 }
 

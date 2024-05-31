@@ -2,6 +2,7 @@ package com.hana.bankai.domain.product.service;
 
 import com.hana.bankai.domain.account.dto.AccountRequestDto;
 import com.hana.bankai.domain.account.dto.AccountResponseDto;
+import com.hana.bankai.domain.account.repository.AccountRepository;
 import com.hana.bankai.domain.product.dto.ProductResponseDto;
 import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.product.entity.Product;
@@ -13,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hana.bankai.global.common.response.SuccessCode.ACCOUNT_BALANCE_CHECK_SUCCESS;
@@ -30,6 +28,9 @@ import static com.hana.bankai.global.error.ErrorCode.PRODUCT_NOT_SEARCH;
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
+    private final AccountRepository accountRepository;
+    
+    // 상품 디테일 페이지
     public ApiResponse<ProductResponseDto.GetProductDetail> getProductDetail(Long prodCode) {
 
         Product p = productRepository.findById(prodCode)
@@ -52,8 +53,9 @@ public class ProductService {
         .prodTerms(p.getProdTerms()).build();
 
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, dto);
-    }
+    };
 
+    // 상품 별 전체 조회 코드
     public ApiResponse<List<ProductResponseDto.GetProduct>> getProduct(int prodType) {
         ProdType prodTypeNum = ProdType.of(prodType);
         List<Product> productList = productRepository.findByProdType(prodTypeNum) ;
@@ -67,19 +69,44 @@ public class ProductService {
                     .prodName(p.getProdName())
                     .prodPromo(p.getProdPromo())
                     .joinMember(p.getJoinMember())
-                    .prodRate(p.getProdRateMthd())
+                    .prodRate(p.getProdRate())
                     .prodLimit(p.getProdLimit())
                     .build();
             productDtoList.add(dto); // 4
         }
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, productDtoList); // Pass the product object
-    }
+    };
+
+    // 전체 조회 코드(타입별로 나눠서 전체를 보내줌)
     public ApiResponse<Map<ProdType, List<Product>>> productSearchAll() {
         List<Product> allProduct = productRepository.findAll();
         Map<ProdType,List<Product>> typeGroupProduct = allProduct.stream()
                 .collect(Collectors.groupingBy(Product::getProdType));
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, typeGroupProduct);
 
+    };
+
+    public ApiResponse<List<ProductResponseDto.GetTopThree>> prodTopThree(){
+        List<Long> getProdTop = accountRepository.getProdTopThree();
+        List<Product> getProdTopThree = productRepository.findByProdCodes(getProdTop);
+        getProdTopThree.sort(Comparator.comparing(product -> getProdTop.indexOf(product.getProdCode())));
+
+        if (getProdTopThree.size() == 0){
+            throw new CustomException(PRODUCT_NOT_SEARCH);
+        }
+        List<ProductResponseDto.GetTopThree> productDtoList =  new ArrayList<>();
+        for(Product p : getProdTopThree){ // 3
+            ProductResponseDto.GetTopThree dto = ProductResponseDto.GetTopThree.builder()
+                    .prodCode(p.getProdCode())
+                    .prodName(p.getProdName())
+                    .prodRate(p.getProdRate())
+                    .prodLimit(p.getProdLimit())
+                    .joinPeriod(p.getJoinPeriod())
+                    .prodDesc(p.getProdDesc())
+                    .build();
+            productDtoList.add(dto); // 4
+        }
+        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS,productDtoList);
     }
 }
 
