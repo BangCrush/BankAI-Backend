@@ -37,25 +37,25 @@ public class AccountService {
     private final UserTrsfLimitService trsfLimitService;
     final PlatformTransactionManager transactionManager;
 
-    public ApiResponse<AccountResponseDto.GetBalance> getBalance(AccountRequestDto.AccCodeReq request, String userId) {
+    public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
         // 사용자 인증
         User user = getUserByUserId(userId);
-        Account account = getAccByAccCode(request.getAccCode());
+        Account account = getAccByAccCode(accCode);
         authenticateUser(user, account.getUser());
 
-        Long balance = retrieveBalance(request.getAccCode());
+        Long balance = retrieveBalance(accCode);
 
         return ApiResponse.success(ACCOUNT_BALANCE_CHECK_SUCCESS, new AccountResponseDto.GetBalance(balance));
     }
 
-    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
-        Account account = getAccByAccCode(request.getAccCode());
+    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(String accCode) {
+        Account account = getAccByAccCode(accCode);
 
         // 해지된 계좌인지 확인
         checkAccStatus(account);
 
         String userName = account.getUser().getUserNameKr();
-        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
+        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(accCode, userName));
     }
 
     public ApiResponse<AccountResponseDto.CheckRes> checkTransferLimit(AccountRequestDto.CheckTransferLimit request) {
