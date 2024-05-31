@@ -71,6 +71,9 @@ dependencies {
 
     // redisson
     implementation 'org.redisson:redisson-spring-boot-starter:3.27.0'
+
+    // smtp
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
 }
 
 tasks.named('test') {

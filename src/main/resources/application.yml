@@ -23,6 +23,19 @@ spring:
         show_sql: true
         format_sql: true
         default_batch_fetch_size: 1000
+  mail:
+    protocol: smtp
+    host: smtp.gmail.com
+    port: 587
+    username: sovvworld@gmail.com
+    password: ENC(C50vL1hKWtxjWhowiyQnMphvAwuPGAJ2dlZZp6n3jNs=)
+    properties:
+      debug: true
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   secret: ENC(Nc28XGoNo/1g3LlvfKffOqNYPtDyBvStWb1oKvaSXSUN/TuvskfniY2kBHhOIbtkh41ewCtGcjgAizO+7Xjccg==)
