@@ -25,14 +25,14 @@ public class AccountController {
 
     @Operation(summary = "계좌 잔액 조회")
     @GetMapping("/balance")
-    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestBody AccountRequestDto.AccCodeReq request, @AuthenticationPrincipal UserDetails user) {
-        return accountService.getBalance(request, user.getUsername());
+    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestParam("acc") String accCode, @AuthenticationPrincipal UserDetails user) {
+        return accountService.getBalance(accCode, user.getUsername());
     }
 
     @Operation(summary = "계좌 검색")
     @GetMapping("/search")
-    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(@RequestBody AccountRequestDto.AccCodeReq request) {
-        return accountService.searchAcc(request);
+    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(@RequestParam("acc") String accCode) {
+        return accountService.searchAcc(accCode);
     }
 
     @Operation(summary = "이체한도 체크")
@@ -55,8 +55,8 @@ public class AccountController {
 
     @Operation(summary = "거래내역 조회")
     @GetMapping("/history")
-    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request, @RequestParam("page") int page, @AuthenticationPrincipal UserDetails user) {
-        return accHisService.getAccHis(request, user.getUsername(), page);
+    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(@RequestParam("acc") String accCode, @RequestParam("page") int page, @AuthenticationPrincipal UserDetails user) {
+        return accHisService.getAccHis(accCode, user.getUsername(), page);
     }
 
     @Operation(summary = "사용자 보유 계좌 조회")

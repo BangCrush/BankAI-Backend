@@ -51,14 +51,12 @@ public class AccHisService {
         accHisRepository.save(accHis);
     }
 
-    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(AccountRequestDto.AccCodeReq request, String userId, int page) {
+    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(String accCode, String userId, int page) {
         // 예외처리
-        Account acc = getAccByAccCode(request.getAccCode());
+        Account acc = getAccByAccCode(accCode);
         // 사용자 인증
         User user = getUserByUserId(userId);
         authenticateUser(user, acc.getUser());
-
-        String accCode = request.getAccCode();
 
         Pageable pageable = PageRequest.of(page - 1, 20);
         Page<AccountHistory> accHistories = accHisRepository.findByAccCodeAndBankCode(accCode, C04, pageable);

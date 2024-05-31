@@ -26,3 +26,43 @@ spring:
 
 jwt:
   secret: ENC(Nc28XGoNo/1g3LlvfKffOqNYPtDyBvStWb1oKvaSXSUN/TuvskfniY2kBHhOIbtkh41ewCtGcjgAizO+7Xjccg==)
+
+# swagger 설정
+springdoc:
+  swagger-ui:
+    groups-order: desc
+    default-model-rendering: example
+    operations-sorter: method
+    tags-sorter: alpha
+    disable-swagger-default-url: true
+    display-request-duration: true
+    deep-linking: true
+    default-model-expand-depth: 2
+    default-models-expand-depth: 2
+  api-docs:
+    path: /bankAi-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  show-actuator: true
+  group-configs:
+    - group: "user"
+      display-name: "User API"
+      paths-to-match:
+        - "/register/**"
+        - "/login/**"
+        - "/logouts"
+    - group: "account"
+      display-name: "Account API"
+      paths-to-match:
+        - "/account/**"
+    - group: "product"
+      display-name: "Product API"
+      paths-to-match:
+        - "/product/**"
+    - group: "all"
+      display-name: "All API"
+      paths-to-match:
+        - "/**"
+  writer-with-default-pretty-printer: true
+  use-management-port: false
+  packages-to-scan: com.hana.bankai.domain.user.controller, com.hana.bankai.domain.account.controller, com.hana.bankai.domain.product.controller
