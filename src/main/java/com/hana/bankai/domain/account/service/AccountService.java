@@ -5,7 +5,6 @@ import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccCodeGenerator;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
-import com.hana.bankai.domain.accounthistory.repository.AccHisRepository;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.domain.product.repsoitory.ProductRepository;
 import com.hana.bankai.domain.user.entity.User;
@@ -51,24 +50,24 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
-    public ApiResponse<AccountResponseDto.GetBalance> getBalance(AccountRequestDto.AccCodeReq request, String userId) {
+    public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
         // 사용자 인증
         User user = getUserByUserId(userId);
-        Account account = getAccByAccCode(request.getAccCode());
+        Account account = getAccByAccCode(accCode);
         authenticateUser(user, account.getUser());
 
-        Long balance = retrieveBalance(request.getAccCode());
+        Long balance = retrieveBalance(accCode);
 
         return ApiResponse.success(ACCOUNT_BALANCE_CHECK_SUCCESS, new AccountResponseDto.GetBalance(balance));
     }
 
-    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
+    public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(String accCode) {
+        Account account = getAccByAccCode(accCode);
 
-        Account account = getAccByAccCode(request.getAccCode());
         // 해지된 계좌인지 확인
         checkAccStatus(account);
         String userName = account.getUser().getUserNameKr();
-        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
+        return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(accCode, userName));
     }
 
     public ApiResponse<AccountResponseDto.CheckRes> checkTransferLimit(AccountRequestDto.CheckTransferLimit request) {
