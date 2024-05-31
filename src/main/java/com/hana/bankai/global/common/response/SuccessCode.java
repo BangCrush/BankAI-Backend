@@ -19,6 +19,7 @@ public enum SuccessCode {
     USER_FIND_ID_SUCCESS(OK, "아이디 찾기 성공"),
     USER_FIND_PWD_SUCCESS(OK, "비밀번호 찾기 성공"),
     USER_LOGOUT_SUCCESS(OK, "로그아웃 성공"),
+    SEND_EMAIL_CODE_SUCCESS(OK, "이메일 인증 코드 전송 성공"),
 
     // Account
     ACCOUNT_CREATE_SUCCESS(OK,"계좌 개설 성공"),
