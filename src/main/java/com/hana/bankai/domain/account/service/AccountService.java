@@ -42,8 +42,11 @@ public class AccountService {
     final private UserTrsfLimitService trsfLimitService;
     final PlatformTransactionManager transactionManager;
 
-    public ApiResponse<AccountResponseDto.GetBalance> getBalance(AccountRequestDto.AccCodeReq request) {
-        // 사용자 인증 확인 (개발 예정)
+    public ApiResponse<AccountResponseDto.GetBalance> getBalance(AccountRequestDto.AccCodeReq request, String userId) {
+        // 사용자 인증
+        User user = getUserByUserId(userId);
+        Account account = getAccByAccCode(request.getAccCode());
+        authenticateUser(user, account.getUser());
 
         Long balance = retrieveBalance(request.getAccCode());
 
@@ -78,15 +81,14 @@ public class AccountService {
     }
 
     @DistributedLock(key = "#request.getOutAccCode()")
-    public ApiResponse transfer(AccountRequestDto.Transfer request) {
-        // 사용자 인증 확인 (개발 예정)
-        // 테스트용
-        String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
-        UUID userCode = UUID.fromString(uuidString);
+    public ApiResponse transfer(AccountRequestDto.Transfer request, String userId) {
+        User user = getUserByUserId(userId);
 
         Account outAcc = getAccByAccCode(request.getOutAccCode());
         Account inAcc = getAccByAccCode(request.getInAccCode());
 
+        // 사용자 인증 예외처리
+        authenticateUser(user, outAcc.getUser());
         // 해지된 계좌 예외처리
         checkAccStatus(inAcc);
         // 유효하지 않은 이체 금액 예외처리
@@ -94,7 +96,7 @@ public class AccountService {
             throw new CustomException(INVALID_TRANSFER_AMOUNT);
         }
         // 이체한도 예외처리
-        if (outAcc.getAccTrsfLimit() < request.getAmount() || trsfLimitService.checkTrsfLimit(userCode, request.getAmount())) {
+        if (outAcc.getAccTrsfLimit() < request.getAmount() || trsfLimitService.checkTrsfLimit(user.getUserCode(), request.getAmount())) {
             throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
         }
 
@@ -106,7 +108,7 @@ public class AccountService {
             // 계좌 로그 생성
             accHisService.createAccHis(request.getAmount(), TRANSFER, inAcc, outAcc);
             // 사용자 이체 한도 > 누적 금액 수정
-            trsfLimitService.accumulate(userCode, request.getAmount());
+            trsfLimitService.accumulate(user.getUserCode(), request.getAmount());
         } catch (CustomException e) {
             if (e.getErrorCode().getCode().equals("E201")) {
                 throw e;
@@ -119,9 +121,12 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_TRANSFER_SUCCESS);
     }
 
-    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(AccountRequestDto.AccCodeReq request) {
+    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(AccountRequestDto.AccCodeReq request, String userId) {
         // 예외처리
         Account acc = getAccByAccCode(request.getAccCode());
+        // 사용자 인증
+        User user = getUserByUserId(userId);
+        authenticateUser(user, acc.getUser());
 
         List<AccountResponseDto.GetAccHis> accHisList = new ArrayList<>();
         try {
@@ -139,15 +144,10 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_HISTORY_CHECK_SUCCESS, accHisList);
     }
 
-    public ApiResponse<List<AccountResponseDto.GetAccInfo>> getAccList() {
-        // 로그인한 사용자 정보 불러오기 (개발 예정)
-        // 테스트용
-        String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
-        UUID userCode = UUID.fromString(uuidString);
-
+    public ApiResponse<List<AccountResponseDto.GetAccInfo>> getAccList(String userId) {
         List<AccountResponseDto.GetAccInfo> accInfoList = new ArrayList<>();
 
-        User user = getUserByUserCode(userCode);
+        User user = getUserByUserId(userId);
         for (Account acc : user.getAccountList()) {
             accInfoList.add(AccountResponseDto.GetAccInfo.from(acc));
         }
@@ -155,12 +155,9 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_LIST_CHECK_SUCCESS, accInfoList);
     }
 
-    public ApiResponse<AccountResponseDto.GetAssets> getAssets() {
+    public ApiResponse<AccountResponseDto.GetAssets> getAssets(String userId) {
         // 로그인한 사용자 정보 불러오기 (개발 예정)
-        // 테스트용
-        String uuidString = "cff1daa8-41f5-49ef-9150-5a6106525c57";
-        UUID userCode = UUID.fromString(uuidString);
-        User user = getUserByUserCode(userCode);
+        User user = getUserByUserId(userId);
 
         Long assets = 0L;
         for (Account acc : user.getAccountList()) {
@@ -217,6 +214,17 @@ public class AccountService {
     private User getUserByUserCode(UUID userCode) {
         return userRepository.findById(userCode)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
+    private User getUserByUserId(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
+    private void authenticateUser(User loginUser, User accUser) {
+        if (!loginUser.equals(accUser)) {
+            throw new CustomException(USER_AUTHENTICATION_FAIL);
+        }
     }
 }
 
