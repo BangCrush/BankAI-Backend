@@ -3,6 +3,7 @@ package com.hana.bankai.domain.account.controller;
 import com.hana.bankai.domain.account.dto.AccountRequestDto;
 import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.service.AccountService;
+import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,8 @@ import java.util.List;
 @RequestMapping("/account")
 public class AccountController {
 
-    final private AccountService accountService;
+    private final AccountService accountService;
+    private final AccHisService accHisService;
 
     @Operation(summary = "계좌 잔액 조회")
     @GetMapping("/balance")
@@ -51,8 +53,8 @@ public class AccountController {
 
     @Operation(summary = "거래내역 조회")
     @GetMapping("/history")
-    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request, @AuthenticationPrincipal UserDetails user) {
-        return accountService.getAccHis(request, user.getUsername());
+    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(@RequestBody AccountRequestDto.AccCodeReq request, @RequestParam("page") int page, @AuthenticationPrincipal UserDetails user) {
+        return accHisService.getAccHis(request, user.getUsername(), page);
     }
 
     @Operation(summary = "사용자 보유 계좌 조회")
