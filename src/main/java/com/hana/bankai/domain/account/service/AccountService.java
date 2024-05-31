@@ -3,11 +3,8 @@ package com.hana.bankai.domain.account.service;
 import com.hana.bankai.domain.account.dto.AccountRequestDto;
 import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccCodeGenerator;
-import com.hana.bankai.domain.account.entity.AccCodeGenerator;
-import com.hana.bankai.domain.account.entity.AccStatus;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
-import com.hana.bankai.domain.accounthistory.entity.AccountHistory;
 import com.hana.bankai.domain.accounthistory.repository.AccHisRepository;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.domain.product.repsoitory.ProductRepository;
@@ -15,9 +12,7 @@ import com.hana.bankai.domain.user.entity.User;
 import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.service.UserTrsfLimitService;
 import com.hana.bankai.global.aop.DistributedLock;
-import com.hana.bankai.global.common.enumtype.BankCode;
 import com.hana.bankai.domain.product.entity.Product;
-import com.hana.bankai.domain.product.repsoitory.ProductRepository;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +26,6 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static com.hana.bankai.domain.account.entity.AccStatus.ACTIVE;
 import static com.hana.bankai.domain.account.entity.AccStatus.DELETED;
@@ -46,7 +40,6 @@ import static com.hana.bankai.global.error.ErrorCode.*;
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final AccHisRepository accHisRepository;
     private final UserRepository userRepository;
     private final AccHisService accHisService;
     private final UserTrsfLimitService trsfLimitService;
@@ -151,8 +144,6 @@ public class AccountService {
         return ApiResponse.success(USER_ASSETS_CHECK_SUCCESS, new AccountResponseDto.GetAssets(assets));
     }
 
-
-
     private void bizLogic(Account outAcc, Account inAcc, Long money) {
         // 잔액 확인
         if (retrieveBalance(outAcc.getAccCode()) < money) {
@@ -164,27 +155,6 @@ public class AccountService {
         inAcc.transfer(money);
     }
 
-
-
-    private List<AccountResponseDto.GetAccHis> makeAccHisDataList(List<AccountHistory> accHisList, boolean isDeposit) {
-        List<AccountResponseDto.GetAccHis> accHisDataList = new ArrayList<>();
-
-        for (AccountHistory accHisReq : accHisList) {
-            String targetAccCode = isDeposit ? accHisReq.getOutAccCode() : accHisReq.getInAccCode();
-            Account targetAcc = getAccByAccCode(targetAccCode);
-            User targetUser = getUserByUserCode(targetAcc.getUser().getUserCode());
-
-            Long hisAmount = isDeposit ? accHisReq.getHisAmount() : -accHisReq.getHisAmount();
-            Long balance = isDeposit ? accHisReq.getAfterInBal() : accHisReq.getAfterOutBal();
-
-            accHisDataList.add(AccountResponseDto.GetAccHis.of(accHisReq, targetUser.getUserNameKr(), hisAmount, balance));
-        }
-
-        return accHisDataList;
-    }
-
-
-
     //상품가입(계좌개설)
     public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request) {
 
@@ -195,7 +165,6 @@ public class AccountService {
         Product productEntity = productRepository.findById(request.getProdCode())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
         LocalDate now = LocalDate.now();
-
         // 계좌 생성 및 계좌번호 중복 체크
         Account savedAccount;
         String accCode;
@@ -236,10 +205,12 @@ public class AccountService {
         Long limit = userRepository.getUserLimit(checkUser.getUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         if (request.getAccTrsfLimit() > limit) {
-            throw new CustomException(INSUFFICIENT_BALANCE);
+            throw new CustomException(LIMIT_MODIFY_FAIL);
         }
         // 비밀번호 체크
-        checkAccountByAccPwd(request.getAccCode(),request.getAccPwd());
+        if (checkAccountByAccPwd(request.getAccCode(),request.getAccPwd())){
+            throw new CustomException(ACCOUNT_PWD_FAIL);
+        };
         // 이체한도 수정
         Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
@@ -253,11 +224,6 @@ public class AccountService {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
         return accPwdCheck.equals(accPwd);
-    }
-
-    private User getUserByUserCode(UUID userCode) {
-        return userRepository.findById(userCode)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
     private User getUserByUserId(String userId) {
