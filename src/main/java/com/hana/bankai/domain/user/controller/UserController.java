@@ -82,18 +82,30 @@ public class UserController {
         return userService.logout(request);
     }
 
-    /* user-info */
+    /* users */
 
     @Operation(summary = "회원 정보 조회")
-    @GetMapping("/user-info")
+    @GetMapping("/users/user-info")
     public ApiResponse<UserResponseDto.UserInfo> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
         return userService.getUserInfo(userDetails.getUsername());
     }
 
     @Operation(summary = "회원 정보 수정")
-    @PutMapping("/user-info")
+    @PutMapping("/users/user-info")
     public ApiResponse<Object> updateUserInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UserRequestDto.UserInfo userInfo) {
         return userService.updateUserInfo(userDetails.getUsername(), userInfo);
+    }
+
+    @Operation(summary = "직업 정보 조회")
+    @GetMapping("/users/job-info")
+    public ApiResponse<UserResponseDto.UserJobInfo> getUserJobInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        return userService.getUserJobInfo(userDetails.getUsername());
+    }
+
+    @Operation(summary = "직업 정보 수정")
+    @PutMapping("/users/job-info")
+    public ApiResponse<Object> updateUserJobInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UserRequestDto.UserJobInfo userJobInfo) {
+        return userService.updateUserJobInfo(userDetails.getUsername(), userJobInfo);
     }
 
 }

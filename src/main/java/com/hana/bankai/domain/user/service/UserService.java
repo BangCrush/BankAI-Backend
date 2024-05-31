@@ -255,4 +255,28 @@ public class UserService implements UserDetailsService {
         return ApiResponse.success(USER_UPDATE_INFO_SUCCESS);
     }
 
+    // 직업 정보 조회
+    public ApiResponse<UserResponseDto.UserJobInfo> getUserJobInfo(String userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_GET_JOB_INFO_FAIL));
+
+        return ApiResponse.success(USER_GET_JOB_INFO_SUCCESS, UserResponseDto.UserJobInfo.from(user.getUserJob()));
+    }
+
+    // 직업 정보 수정
+    public ApiResponse<Object> updateUserJobInfo(String userId, UserRequestDto.UserJobInfo request) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_UPDATE_JOB_INFO_FAIL));
+
+        userJobRepository.updateUserJob(
+                user.getUserCode(),
+                request.getJobName(),
+                request.getCompanyName(),
+                request.getCompanyAddr(),
+                request.getCompanyPhone()
+        );
+
+        return ApiResponse.success(USER_UPDATE_JOB_INFO_SUCCESS);
+    }
+
 }

@@ -21,6 +21,8 @@ public enum SuccessCode {
     USER_LOGOUT_SUCCESS(OK, "로그아웃 성공"),
     USER_GET_INFO_SUCCESS(OK, "회원 정보 조회 성공"),
     USER_UPDATE_INFO_SUCCESS(OK, "회원 정보 수정 성공"),
+    USER_GET_JOB_INFO_SUCCESS(OK, "직업 정보 조회 성공"),
+    USER_UPDATE_JOB_INFO_SUCCESS(OK, "직장 정보 수정 성공"),
 
     // Account
     ACCOUNT_BALANCE_CHECK_SUCCESS(OK, "계좌 잔액 조회 성공"),

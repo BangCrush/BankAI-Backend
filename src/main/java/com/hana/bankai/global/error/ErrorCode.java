@@ -14,6 +14,8 @@ public enum ErrorCode {
     USER_TRSF_LIMIT_NOT_FOUND("E104", "사용자 일일 이체 한도 조회 불가"),
     USER_GET_INFO_FAIL("E106", "회원 정보 조회 실패"),
     USER_UPDATE_INFO_FAIL("E107", "회원 정보 수정 실패"),
+    USER_GET_JOB_INFO_FAIL("E108", "직업 정보 조회 실패"),
+    USER_UPDATE_JOB_INFO_FAIL("E109", "직업 정보 수정 실패"),
 
     // Account
     ACCOUNT_NOT_FOUND("E200", "존재하지 않는 계좌입니다."),

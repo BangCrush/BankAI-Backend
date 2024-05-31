@@ -143,4 +143,19 @@ public class UserRequestDto {
         private String userMainAcc;
     }
 
+    @Getter
+    public static class UserJobInfo {
+        @NotEmpty(message = "직업명을 입력하세요.")
+        private String jobName;
+
+        @NotEmpty(message = "직장명을 입력하세요.")
+        private String companyName;
+
+        @NotEmpty(message = "직장 주소를 입력하세요.")
+        private String companyAddr;
+
+        @NotEmpty(message = "직장 연락처를 입력하세요.")
+        private String companyPhone;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.hana.bankai.domain.user.dto;
 
 import com.hana.bankai.domain.user.entity.User;
+import com.hana.bankai.domain.user.entity.UserJob;
 import lombok.*;
 
 public class UserResponseDto {
@@ -40,7 +41,7 @@ public class UserResponseDto {
         private String userPwd;
     }
 
-    // mypage 사용자 정보 조회
+    // 회원 개인 정보 조회
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
@@ -69,6 +70,32 @@ public class UserResponseDto {
                     .companyName(user.getUserJob() != null ? user.getUserJob().getCompanyName() : null)
                     .companyAddr(user.getUserJob() != null ? user.getUserJob().getCompanyAddr() : null)
                     .companyPhone(user.getUserJob() != null ? user.getUserJob().getCompanyPhone() : null)
+                    .build();
+        }
+    }
+
+    // 회원 직업 정보 조회
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class UserJobInfo {
+        private String jobName;
+        private String companyName;
+        private String companyAddr;
+        private String companyPhone;
+
+        public static UserJobInfo from(UserJob userJob) {
+            // 직업 정보가 없으면 null return
+            if(userJob.getJobName() == null && userJob.getCompanyName() == null && userJob.getCompanyAddr() == null && userJob.getCompanyPhone() == null) {
+                return null;
+            }
+
+            return UserJobInfo.builder()
+                    .jobName(userJob.getJobName())
+                    .companyName(userJob.getCompanyName())
+                    .companyAddr(userJob.getCompanyAddr())
+                    .companyPhone(userJob.getCompanyPhone())
                     .build();
         }
     }
