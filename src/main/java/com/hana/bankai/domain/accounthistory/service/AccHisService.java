@@ -69,7 +69,7 @@ public class AccHisService {
     }
 
     private AccountResponseDto.GetAccHis makeAccHisData(AccountHistory accHisReq, String accCode) {
-        boolean isDeposit = accHisReq.getOutAccCode().equals(accCode);
+        boolean isDeposit = accHisReq.getInAccCode().equals(accCode);
         String targetAccCode = isDeposit ? accHisReq.getOutAccCode() : accHisReq.getInAccCode();
         Account targetAcc = getAccByAccCode(targetAccCode);
         User targetUser = getUserByUserId(targetAcc.getUser().getUserId());
