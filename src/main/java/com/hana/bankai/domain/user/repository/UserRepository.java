@@ -18,8 +18,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     // 중복 ID 확인
     Boolean existsByUserId(String userId);
-  
-    // 로그인 - 입력받은 아이디 기준으로 계정 조회
+
     Optional<User> findByUserId(String userId);
 
     // 아이디 조회

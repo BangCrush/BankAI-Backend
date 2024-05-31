@@ -4,7 +4,9 @@ import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
 import com.hana.bankai.domain.user.entity.Role;
 import com.hana.bankai.domain.user.entity.User;
+import com.hana.bankai.domain.user.entity.UserJob;
 import com.hana.bankai.domain.user.entity.UserTrsfLimit;
+import com.hana.bankai.domain.user.repository.UserJobRepository;
 import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.repository.UserTrsfLimitRepository;
 import com.hana.bankai.global.common.response.ApiResponse;
@@ -36,6 +38,7 @@ import static com.hana.bankai.global.error.ErrorCode.*;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final UserJobRepository userJobRepository;
     private final UserTrsfLimitRepository trsfLimitRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -100,8 +103,14 @@ public class UserService implements UserDetailsService {
                 .roles(Collections.singletonList(Role.ROLE_USER.name()))
                 .build();
 
-        // DB 저장
         userRepository.save(user);
+
+        // UserJob 생성
+        UserJob userJob = UserJob.builder()
+                .user(user)
+                .build();
+
+        userJobRepository.save(userJob);
 
         // UserTrsfLimit 생성
         UserTrsfLimit userTrsfLimit = UserTrsfLimit.builder()
@@ -110,7 +119,6 @@ public class UserService implements UserDetailsService {
       
         trsfLimitRepository.save(userTrsfLimit);
 
-        // return
         return ApiResponse.success(USER_REGISTER_SUCCESS);
     }
 
@@ -214,6 +222,14 @@ public class UserService implements UserDetailsService {
         // 5. 이후 JwtAuthenticationFilter 에서 redis 에 있는 logout 정보를 가지고 와서 접근을 거부함
 
         return ApiResponse.success(USER_LOGOUT_SUCCESS);
+    }
+
+    // 회원 정보 조회
+    public ApiResponse<UserResponseDto.UserInfo> userInfo(String userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_GET_INFO_FAIL));
+
+        return ApiResponse.success(USER_GET_INFO_SUCCESS, UserResponseDto.UserInfo.from(user));
     }
 
 }

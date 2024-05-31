@@ -63,7 +63,6 @@ public class UserRequestDto {
 
         @NotEmpty(message = "상세주소를 입력하세요.")
         private String userAddrDetail;
-
     }
 
     /* login */

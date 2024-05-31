@@ -21,15 +21,15 @@ class InsertTests {
         log.info(" *** User Insert Test *** ");
 
         UserRequestDto.Register register = UserRequestDto.Register.builder()
-                .userId("user02")
+                .userId("user01")
                 .userPwd("1111")
-                .userNameKr("홍길동")
-                .userInherentNumber("901234-1234568")
-                .userPhone("010-1234-1234")
+                .userNameKr("봉식이")
+                .userInherentNumber("901234-1234570")
+                .userPhone("010-1234-1236")
                 .userAddr("대한민국")
-                .userAddrDetail("부산")
-                .userNameEn("Hong")
-                .userEmail("hong@gmail.com")
+                .userAddrDetail("대구")
+                .userNameEn("Bong")
+                .userEmail("bong@gmail.com")
                 .build();
 
         service.register(register);

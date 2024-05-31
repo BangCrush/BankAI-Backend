@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-@ToString
+@ToString(exclude = "user") // user 정보를 출력할 때 무한루프 방지
 @Getter
 @EntityListeners(AuditingEntityListener.class) // 이벤트가 발생되었을 때 자동 실행
 public class UserTrsfLimit {

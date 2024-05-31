@@ -1,13 +1,14 @@
 package com.hana.bankai.domain.user.dto;
 
+import com.hana.bankai.domain.user.entity.User;
 import lombok.*;
 
 public class UserResponseDto {
 
+    // 회원가입 시 중복 계정, 이메일, 아이디 여부 확인
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    // 회원가입 시 중복 계정, 이메일, 아이디 여부 확인
     public static class RegisterDuplicateCheck {
         // 중복이면 true, 아니면 false 반환
         private Boolean check;
@@ -23,20 +24,53 @@ public class UserResponseDto {
         private Long refreshTokenExpirationTime;
     }
 
+    // 아이디 찾기
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    // 아이디 찾기
     public static class LoginFindId {
         private String userId;
     }
 
+    // 비밀번호 찾기
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    // 비밀번호 찾기
     public static class LoginFindPwd {
         private String userPwd;
+    }
+
+    // mypage 사용자 정보 조회
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class UserInfo {
+        private String userNameKr;
+        private String userNameEn;
+        private String userPhone;
+        private String userEmail;
+        private String userAddr;
+        private String userAddrDetail;
+        private String jobName;
+        private String companyName;
+        private String companyAddr;
+        private String companyPhone;
+
+        public static UserInfo from(User user) {
+            return UserInfo.builder()
+                    .userNameKr(user.getUserNameKr())
+                    .userNameEn(user.getUserNameEn())
+                    .userPhone(user.getUserPhone())
+                    .userEmail(user.getUserEmail())
+                    .userAddr(user.getUserAddr())
+                    .userAddrDetail(user.getUserAddrDetail())
+                    .jobName(user.getUserJob() != null ? user.getUserJob().getJobName() : null)
+                    .companyName(user.getUserJob() != null ? user.getUserJob().getCompanyName() : null)
+                    .companyAddr(user.getUserJob() != null ? user.getUserJob().getCompanyAddr() : null)
+                    .companyPhone(user.getUserJob() != null ? user.getUserJob().getCompanyPhone() : null)
+                    .build();
+        }
     }
 
 }

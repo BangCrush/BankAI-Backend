@@ -7,12 +7,16 @@ import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.hana.bankai.global.error.ErrorCode.USER_REGISTER_VALIDATION_FAIL;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -76,6 +80,14 @@ public class UserController {
     @PostMapping("/logouts")
     public ApiResponse<Object> logout(@RequestBody UserRequestDto.Logout request) {
         return userService.logout(request);
+    }
+
+    /* user-info */
+
+    @Operation(summary = "회원 정보 조회")
+    @GetMapping("/user-info")
+    public ApiResponse<UserResponseDto.UserInfo> userInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        return userService.userInfo(userDetails.getUsername());
     }
 
 }
