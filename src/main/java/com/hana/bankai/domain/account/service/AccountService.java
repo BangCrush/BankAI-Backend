@@ -69,10 +69,8 @@ public class AccountService {
     public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(AccountRequestDto.AccCodeReq request) {
 
         Account account = getAccByAccCode(request.getAccCode());
-
         // 해지된 계좌인지 확인
         checkAccStatus(account);
-
         String userName = account.getUser().getUserNameKr();
         return ApiResponse.success(ACCOUNT_SEARCH_SUCCESS, new AccountResponseDto.SearchAcc(request.getAccCode(), userName));
     }
@@ -80,10 +78,7 @@ public class AccountService {
     public ApiResponse<AccountResponseDto.CheckRes> checkTransferLimit(AccountRequestDto.CheckTransferLimit request) {
         Long balance = accountRepository.findAccBalanceByAccCode(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-
         boolean isTransferAble = balance >= request.getAmount();
-
-
         return ApiResponse.success(ACCOUNT_LIMIT_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isTransferAble));
     }
 
@@ -133,29 +128,6 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_TRANSFER_SUCCESS);
     }
 
-    public ApiResponse<List<AccountResponseDto.GetAccHis>> getAccHis(AccountRequestDto.AccCodeReq request, String userId) {
-        // 예외처리
-        Account acc = getAccByAccCode(request.getAccCode());
-        // 사용자 인증
-        User user = getUserByUserId(userId);
-        authenticateUser(user, acc.getUser());
-
-        List<AccountResponseDto.GetAccHis> accHisList = new ArrayList<>();
-        try {
-            // 입금
-            List<AccountHistory> accHisDepositList = accHisRepository.findByInAccCodeAndInBankCode(acc.getAccCode(), BankCode.C04);
-            // 출금
-            List<AccountHistory> accHisWithdrawList = accHisRepository.findByOutAccCodeAndOutBankCode(acc.getAccCode(), BankCode.C04);
-
-            accHisList.addAll(makeAccHisDataList(accHisDepositList, true));
-            accHisList.addAll(makeAccHisDataList(accHisWithdrawList, false));
-        } catch (Exception e) {
-            throw new CustomException(FIND_ACCOUNT_HISTORY_FAIL);
-        }
-
-        return ApiResponse.success(ACCOUNT_HISTORY_CHECK_SUCCESS, accHisList);
-    }
-
     public ApiResponse<List<AccountResponseDto.GetAccInfo>> getAccList(String userId) {
         List<AccountResponseDto.GetAccInfo> accInfoList = new ArrayList<>();
 
@@ -179,15 +151,7 @@ public class AccountService {
         return ApiResponse.success(USER_ASSETS_CHECK_SUCCESS, new AccountResponseDto.GetAssets(assets));
     }
 
-    private Account getAccByAccCode(String accCode) {
-        return accountRepository.findById(accCode)
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-    }
 
-    private Long retrieveBalance(String accCode) {
-        return accountRepository.findAccBalanceByAccCode(accCode)
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-    }
 
     private void bizLogic(Account outAcc, Account inAcc, Long money) {
         // 잔액 확인
@@ -200,11 +164,7 @@ public class AccountService {
         inAcc.transfer(money);
     }
 
-    private void checkAccStatus(Account acc) {
-        if (acc.getStatus() == DELETED) {
-            throw new CustomException(ACCOUNT_NOT_FOUND);
-        }
-    }
+
 
     private List<AccountResponseDto.GetAccHis> makeAccHisDataList(List<AccountHistory> accHisList, boolean isDeposit) {
         List<AccountResponseDto.GetAccHis> accHisDataList = new ArrayList<>();
@@ -223,21 +183,8 @@ public class AccountService {
         return accHisDataList;
     }
 
-    private User getUserByUserCode(UUID userCode) {
-        return userRepository.findById(userCode)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-    }
 
-    private User getUserByUserId(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-    }
 
-    private void authenticateUser(User loginUser, User accUser) {
-        if (!loginUser.equals(accUser)) {
-            throw new CustomException(USER_AUTHENTICATION_FAIL);
-        }
-    }
     //상품가입(계좌개설)
     public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request) {
 
@@ -306,6 +253,38 @@ public class AccountService {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
         return accPwdCheck.equals(accPwd);
+    }
+
+    private User getUserByUserCode(UUID userCode) {
+        return userRepository.findById(userCode)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
+    private User getUserByUserId(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
+    private void authenticateUser(User loginUser, User accUser) {
+        if (!loginUser.equals(accUser)) {
+            throw new CustomException(USER_AUTHENTICATION_FAIL);
+        }
+    }
+
+    private void checkAccStatus(Account acc) {
+        if (acc.getStatus() == DELETED) {
+            throw new CustomException(ACCOUNT_NOT_FOUND);
+        }
+    }
+
+    private Account getAccByAccCode(String accCode) {
+        return accountRepository.findById(accCode)
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+    }
+
+    private Long retrieveBalance(String accCode) {
+        return accountRepository.findAccBalanceByAccCode(accCode)
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
     }
 
 }
