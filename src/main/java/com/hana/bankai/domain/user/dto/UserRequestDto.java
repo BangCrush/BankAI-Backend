@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 public class UserRequestDto {
@@ -100,7 +99,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    // 비밀번호 찾기
     public static class LoginFindPwd {
         @NotEmpty(message = "이름을 입력하세요.")
         private String userNameKr;
@@ -119,6 +117,30 @@ public class UserRequestDto {
 
         @NotEmpty(message = "잘못된 요청입니다.")
         private String refreshToken;
+    }
+
+    @Getter
+    public static class UserInfo {
+        @NotEmpty(message = "비밀번호를 입력하세요.")
+        private String userPwd;
+
+        @NotEmpty(message = "이메일을 입력하세요.")
+        private String userEmail;
+
+        @NotEmpty(message = "휴대번호을 입력하세요.")
+        private String userPhone;
+
+        @NotEmpty(message = "주소를 입력하세요.")
+        private String userAddr;
+
+        @NotEmpty(message = "상세 주소를 입력하세요.")
+        private String userAddrDetail;
+
+        @NotEmpty(message = "일일 최대한도을 입력하세요.")
+        private Long userTrsfLimit;
+
+        @NotEmpty(message = "주 계좌를 입력하세요.")
+        private String userMainAcc;
     }
 
 }

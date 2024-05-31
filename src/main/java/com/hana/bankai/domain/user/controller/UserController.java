@@ -86,8 +86,14 @@ public class UserController {
 
     @Operation(summary = "회원 정보 조회")
     @GetMapping("/user-info")
-    public ApiResponse<UserResponseDto.UserInfo> userInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        return userService.userInfo(userDetails.getUsername());
+    public ApiResponse<UserResponseDto.UserInfo> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        return userService.getUserInfo(userDetails.getUsername());
+    }
+
+    @Operation(summary = "회원 정보 수정")
+    @PutMapping("/user-info")
+    public ApiResponse<Object> updateUserInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UserRequestDto.UserInfo userInfo) {
+        return userService.updateUserInfo(userDetails.getUsername(), userInfo);
     }
 
 }

@@ -225,11 +225,34 @@ public class UserService implements UserDetailsService {
     }
 
     // 회원 정보 조회
-    public ApiResponse<UserResponseDto.UserInfo> userInfo(String userId) {
+    public ApiResponse<UserResponseDto.UserInfo> getUserInfo(String userId) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(USER_GET_INFO_FAIL));
 
         return ApiResponse.success(USER_GET_INFO_SUCCESS, UserResponseDto.UserInfo.from(user));
+    }
+
+    // 회원 정보 수정
+    public ApiResponse<Object> updateUserInfo(String userId, UserRequestDto.UserInfo request) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_UPDATE_INFO_FAIL));
+
+        userRepository.updateUser(
+                user.getUserCode(),
+                passwordEncoder.encode(request.getUserPwd()),
+                request.getUserEmail(),
+                request.getUserPhone(),
+                request.getUserAddr(),
+                request.getUserAddrDetail(),
+                request.getUserMainAcc()
+        );
+
+        trsfLimitRepository.updateDailyLimit(
+                user.getUserCode(),
+                request.getUserTrsfLimit()
+        );
+
+        return ApiResponse.success(USER_UPDATE_INFO_SUCCESS);
     }
 
 }
