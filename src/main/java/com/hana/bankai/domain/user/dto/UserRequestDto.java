@@ -11,22 +11,22 @@ public class UserRequestDto {
 
     /* register */
 
-    @Getter
     // 회원가입 여부 확인
+    @Getter
     public static class RegisterCheck {
         @NotEmpty(message = "주민등록번호는 필수 입력값입니다.")
         private String userInherentNumber;
     }
 
-    @Getter
     // 중복 이메일 확인
+    @Getter
     public static class RegisterCheckEmail {
         @NotEmpty(message = "이메일는 필수 입력값입니다.")
         private String userEmail;
     }
 
-    @Getter
     // 중복 ID 확인
+    @Getter
     public static class RegisterCheckId {
         @NotEmpty(message = "아이디는 필수 입력값입니다.")
         private String userId;
@@ -82,7 +82,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     public static class Reissue {
         @NotEmpty(message = "accessToken 을 입력해주세요.")
         private String accessToken;
@@ -92,8 +91,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
-    // 아이디 찾기
     public static class LoginFindId {
         @NotEmpty(message = "이름을 입력하세요.")
         private String userNameKr;
@@ -103,7 +100,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     // 비밀번호 찾기
     public static class LoginFindPwd {
         @NotEmpty(message = "이름을 입력하세요.")
@@ -117,7 +113,6 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     public static class Logout {
         @NotEmpty(message = "잘못된 요청입니다.")
         private String accessToken;
