@@ -13,14 +13,6 @@ import java.util.UUID;
 public class AccountRequestDto {
 
     @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class AccCodeReq {
-        private String accCode;
-    }
-
-    @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class CheckTransferLimit {
         private String accCode;

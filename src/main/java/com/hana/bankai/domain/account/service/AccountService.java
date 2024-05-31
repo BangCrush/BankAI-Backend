@@ -5,7 +5,6 @@ import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccCodeGenerator;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
-import com.hana.bankai.domain.accounthistory.repository.AccHisRepository;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.domain.product.repsoitory.ProductRepository;
 import com.hana.bankai.domain.user.entity.User;
