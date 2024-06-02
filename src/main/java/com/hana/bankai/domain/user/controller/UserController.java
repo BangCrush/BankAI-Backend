@@ -91,8 +91,8 @@ public class UserController {
     /* logout */
 
     @Operation(summary = "로그아웃")
-    @PostMapping("/logouts")
-    public ApiResponse<Object> logout(@RequestBody UserRequestDto.Logout request) {
+    @PostMapping("/signout")
+    public ApiResponse<Object> signout(@RequestBody UserRequestDto.Logout request) {
         return userService.logout(request);
     }
 

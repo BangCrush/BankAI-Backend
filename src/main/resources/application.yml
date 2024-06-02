@@ -63,7 +63,7 @@ springdoc:
       paths-to-match:
         - "/register/**"
         - "/login/**"
-        - "/logouts"
+        - "/signout"
         - "/users"
     - group: "account"
       display-name: "Account API"
