@@ -25,7 +25,8 @@ public class AccountController {
 
     @Operation(summary = "계좌 잔액 조회")
     @GetMapping("/balance")
-    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestParam("acc") String accCode, @AuthenticationPrincipal UserDetails user) {
+    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestParam("acc") String accCode,
+                                                                 @AuthenticationPrincipal UserDetails user) {
         return accountService.getBalance(accCode, user.getUsername());
     }
 
@@ -73,8 +74,9 @@ public class AccountController {
 
     @Operation(summary = "계좌 생성")
     @PostMapping("/opening")
-    public ApiResponse<AccountResponseDto.JoinAcc> openAcc(@RequestBody AccountRequestDto.ProdJoinReq request) {
-        return accountService.joinAcc(request);
+    public ApiResponse<AccountResponseDto.JoinAcc> openAcc(@RequestBody AccountRequestDto.ProdJoinReq request,
+                                                           @AuthenticationPrincipal UserDetails user) {
+        return accountService.joinAcc(request, user.getUsername());
     }
 
     @Operation(summary = "계좌 해지")

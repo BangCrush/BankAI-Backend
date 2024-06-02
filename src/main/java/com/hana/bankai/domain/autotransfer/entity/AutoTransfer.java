@@ -22,6 +22,7 @@ public class AutoTransfer {
 
     @Column
     @NotNull
+    @Enumerated(EnumType.STRING)
     private BankCode inBankCode;
 
     @Column
