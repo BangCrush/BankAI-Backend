@@ -1,5 +1,6 @@
 package com.hana.bankai.domain.account.dto;
 
+import com.hana.bankai.domain.autotransfer.entity.AutoTransfer;
 import com.hana.bankai.global.common.enumtype.BankCode;
 import lombok.*;
 
@@ -32,12 +33,12 @@ public class AccountRequestDto {
         private BankCode outBankCode;
         private Long amount;
 
-        public static Transfer of(String inAccCode, BankCode inBankCode, String outAccCode, Long amount ) {
+        public static Transfer from(AutoTransfer autoTransfer) {
             return Transfer.builder()
-                    .inAccCode(inAccCode)
-                    .inBankCode(inBankCode)
-                    .outAccCode(outAccCode)
-                    .amount(amount)
+                    .inAccCode(autoTransfer.getAutoTransferId().getInAccCode())
+                    .inBankCode(autoTransfer.getInBankCode())
+                    .outAccCode(autoTransfer.getAutoTransferId().getOutAccCode())
+                    .amount(autoTransfer.getAtAmount())
                     .build();
         }
     }
