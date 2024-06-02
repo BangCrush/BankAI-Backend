@@ -23,31 +23,32 @@ public class AutoTransferService {
     private final AccountService accountService;
 
     public void autoTransfer() {
-        // 오늘 날짜(며칠인지) 조회
-        int todayDay = LocalDate.now().getDayOfMonth();
-
         // 자동이체 DB Table 에서 모든 데이터를 조회
         List<AutoTransfer> autoTransferList = autoTransferRepository.findAll();
-
         for(AutoTransfer autoTransfer : autoTransferList) {
-            // 오늘이 자동이체 날이면 자동이체 실행
-            if(autoTransfer.getAutoTransferId().getAtDate() != todayDay) continue;
-
-            // 출금 계좌 user ID 조회
-            Account outAccount = autoTransfer.getAccount();
-            String userId = outAccount.getUser().getUserId();
-
-            // 이체(Transfer) DTO 생성
-            AccountRequestDto.Transfer transfer = AccountRequestDto.Transfer.of(
-                    autoTransfer.getAutoTransferId().getInAccCode(),
-                    autoTransfer.getInBankCode(),
-                    autoTransfer.getAutoTransferId().getOutAccCode(),
-                    autoTransfer.getAtAmount()
-            );
-
-            // 이체 Service 호출
-            accountService.transfer(transfer, userId);
+            // 자동이체 실행
+            setAutoTransfer(autoTransfer);
         }
+    }
+
+    public void setAutoTransfer(AutoTransfer autoTransfer) {
+        // 오늘이 자동이체 날이면 자동이체 실행
+        if(autoTransfer.getAutoTransferId().getAtDate() != LocalDate.now().getDayOfMonth()) return;
+
+        // 출금 계좌 user ID 조회
+        Account outAccount = autoTransfer.getAccount();
+        String userId = outAccount.getUser().getUserId();
+
+        // 이체(Transfer) DTO 생성
+        AccountRequestDto.Transfer transfer = AccountRequestDto.Transfer.of(
+                autoTransfer.getAutoTransferId().getInAccCode(),
+                autoTransfer.getInBankCode(),
+                autoTransfer.getAutoTransferId().getOutAccCode(),
+                autoTransfer.getAtAmount()
+        );
+
+        // 이체 Service 호출
+        accountService.transfer(transfer, userId);
     }
 
 }
