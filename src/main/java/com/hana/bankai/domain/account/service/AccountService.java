@@ -158,11 +158,10 @@ public class AccountService {
     }
 
     //상품가입(계좌개설)
-    public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request) {
+    public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request, String userId) {
 
         // User 객체 불러오기
-        User userEntity = userRepository.findById(request.getUserCode())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User userEntity = getUserByUserId(userId);
         // Product 객체 불러오기
         Product productEntity = productRepository.findById(request.getProdCode())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
@@ -224,7 +223,7 @@ public class AccountService {
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        return passwordEncoder.matches(accPwd, accPwdCheck);
+        return accPwd.equals(accPwdCheck);
     }
 
     private User getUserByUserId(String userId) {

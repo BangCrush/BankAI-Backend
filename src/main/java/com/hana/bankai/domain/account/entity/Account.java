@@ -28,8 +28,6 @@ import java.util.List;
 public class Account {
 
     @Id
-//    @GeneratedValue(generator = "acc-code-generator")
-//    @GenericGenerator(name = "acc-code-generator", strategy = "com.hana.bankai.domain.account.entity.AccCodeGenerator")
     private String accCode;
 
     @ManyToOne

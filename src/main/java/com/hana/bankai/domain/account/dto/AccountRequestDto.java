@@ -44,12 +44,11 @@ public class AccountRequestDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class ProdJoinReq {
-        private UUID userCode;
         private Long prodCode;
         private Long amount;
         private int period;
         private String outAccount;
-        private int autoTransferte;
+        private int autoTransfer;
         private String accountPwd;
         private Long accTrsfLimit;
     }
