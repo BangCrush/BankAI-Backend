@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.hana.bankai.global.error.ErrorCode.USER_REGISTER_VALIDATION_FAIL;
+import static com.hana.bankai.global.error.ErrorCode.USER_REISSUE_FAIL;
 
 @Slf4j
 @RestController
@@ -62,6 +63,17 @@ public class UserController {
     @PostMapping("/login")
     public ApiResponse<UserResponseDto.TokenInfo> login(@RequestBody UserRequestDto.Login request) {
         return userService.login(request);
+    }
+
+    @Operation(summary = "토큰 재발급")
+    @PostMapping("/login/reissue")
+    public ApiResponse<UserResponseDto.TokenInfo> reissue(@RequestBody UserRequestDto.Reissue reissue, Errors errors) {
+        // validation check -> ## 어떤 경우에 예외? 강사님께 여쭤보기 ##
+        if(errors.hasErrors()) {
+            throw new CustomException(USER_REISSUE_FAIL);
+        }
+
+        return userService.reissue(reissue);
     }
 
     @Operation(summary = "아이디 찾기")
