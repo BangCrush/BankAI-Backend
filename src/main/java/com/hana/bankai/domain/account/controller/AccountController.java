@@ -73,8 +73,9 @@ public class AccountController {
 
     @Operation(summary = "계좌 생성")
     @PostMapping("/opening")
-    public ApiResponse<AccountResponseDto.JoinAcc> openAcc(@RequestBody AccountRequestDto.ProdJoinReq request) {
-        return accountService.joinAcc(request);
+    public ApiResponse<AccountResponseDto.JoinAcc> openAcc(@RequestBody AccountRequestDto.ProdJoinReq request,
+                                                           @AuthenticationPrincipal UserDetails user) {
+        return accountService.joinAcc(request, user.getUsername());
     }
 
     @Operation(summary = "계좌 해지")
