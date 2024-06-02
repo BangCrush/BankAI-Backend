@@ -6,6 +6,10 @@ import com.hana.bankai.domain.account.entity.AccCodeGenerator;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
+import com.hana.bankai.domain.autotransfer.entity.AutoTransfer;
+import com.hana.bankai.domain.autotransfer.entity.AutoTransferId;
+import com.hana.bankai.domain.autotransfer.repository.AutoTransferRepository;
+import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.product.repsoitory.ProductRepository;
 import com.hana.bankai.domain.user.entity.User;
 import com.hana.bankai.domain.user.repository.UserRepository;
@@ -48,6 +52,7 @@ public class AccountService {
     private final AccCodeGenerator accCodeGenerator;
     private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final AutoTransferRepository autoTransferRepository;
 
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
@@ -157,16 +162,18 @@ public class AccountService {
         inAcc.transfer(money);
     }
 
-    //상품가입(계좌개설)
-    public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request) {
-
+    // 상품가입 (계좌개설)
+    public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request, String userId) {
         // User 객체 불러오기
-        User userEntity = userRepository.findById(request.getUserCode())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User userEntity = getUserByUserId(userId);
+
         // Product 객체 불러오기
         Product productEntity = productRepository.findById(request.getProdCode())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
+
+        // 만기일 설정을 위한 시간 조회
         LocalDate now = LocalDate.now();
+
         // 계좌 생성 및 계좌번호 중복 체크
         Account savedAccount;
         String accCode;
@@ -179,11 +186,35 @@ public class AccountService {
                 .product(productEntity)
                 .accBalance(request.getAmount())
                 .accTrsfLimit(request.getAccTrsfLimit())
-                .accTime(now.plusMonths(request.getPeriod())) //plusMonths으로 만기일지정
+                .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
                 .accPwd(request.getAccountPwd())
                 .status(ACTIVE)
                 .build();
+
         accountRepository.save(savedAccount);
+
+        // 자동 이체 설정 (적금 또는 대출일 때만)
+        if(productEntity.getProdType().equals(ProdType.SAVINGS) || productEntity.getProdType().equals(ProdType.LOAN)) {
+            // 출금 계좌 조회
+            Account outAccount = getAccByAccCode(request.getOutAccount());
+
+            // 자동이체 Entity 생성
+            AutoTransferId autoTransferId = AutoTransferId.builder()
+                    .atDate(request.getAtDate())
+                    .inAccCode(savedAccount.getAccCode())
+                    .outAccCode(request.getOutAccount())
+                    .build();
+
+            AutoTransfer autoTransfer = AutoTransfer.builder()
+                    .autoTransferId(autoTransferId)
+                    .inBankCode(request.getInBankCode())
+                    .atAmount(request.getAmount() / request.getPeriod()) // ex. 12개월 만기 120만원이면 매달 10만(120만/12)원씩 자동 이체
+                    .account(outAccount)
+                    .build();
+
+            // 저장
+            autoTransferRepository.save(autoTransfer);
+        }
 
         AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
         return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
