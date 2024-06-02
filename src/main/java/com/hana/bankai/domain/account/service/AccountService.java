@@ -194,7 +194,49 @@ public class AccountService {
         accountRepository.save(savedAccount);
 
         // 자동 이체 설정 (적금 또는 대출일 때만)
-        if(productEntity.getProdType().equals(ProdType.SAVINGS) || productEntity.getProdType().equals(ProdType.LOAN)) {
+        setAutoTransfer(request, productEntity, savedAccount);
+
+        AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
+        return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
+    }
+
+    // 계좌해지
+    public ApiResponse<Object> terminationAcc(AccountRequestDto.CheckAccPwd request){
+        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+        account.setStatus(DELETED);
+        account.setAccBalance(0L);
+        return ApiResponse.success(ACCOUNT_DELETE_SUCCESS);
+    }
+
+    // 이체한도 수정(각 계좌별)
+    public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request,
+                                                  String userId){
+        // 회원 이체한도 보다 많을 수 없음 체크
+        User checkUser = getUserByUserId(userId);
+        Long limit = userRepository.getUserLimit(checkUser.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        if (request.getAccTrsfLimit() > limit) {
+            throw new CustomException(LIMIT_MODIFY_FAIL);
+        }
+
+        // 비밀번호 체크
+        if (checkAccountByAccPwd(request.getAccCode(),request.getAccPwd())){
+            throw new CustomException(ACCOUNT_PWD_FAIL);
+        };
+
+        // 이체한도 수정
+        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+        account.setAccTrsfLimit(request.getAccTrsfLimit());
+        return ApiResponse.success(ACCOUNT_LIMIT_MODIFY_SUCCESS);
+    }
+
+    // 자동 이체 설정
+    private void setAutoTransfer(AccountRequestDto.ProdJoinReq request, Product product, Account savedAccount) {
+        // 적금 또는 대출일 때만 실행
+        if(product.getProdType().equals(ProdType.SAVINGS) || product.getProdType().equals(ProdType.LOAN)) {
             // 출금 계좌 조회
             Account outAccount = getAccByAccCode(request.getOutAccount());
 
@@ -215,41 +257,7 @@ public class AccountService {
             // 저장
             autoTransferRepository.save(autoTransfer);
         }
-
-        AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
-        return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
     }
-
-    // 계좌해지
-    public ApiResponse<Object> terminationAcc(AccountRequestDto.CheckAccPwd request){
-        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        account.setStatus(DELETED);
-        account.setAccBalance(0L);
-        return ApiResponse.success(ACCOUNT_DELETE_SUCCESS);
-    }
-
-    //이체한도 수정(각 계좌별)
-    public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request,
-                                                  String userId){
-        // 회원 이체한도 보다 많을 수 없음 체크
-        User checkUser = getUserByUserId(userId);
-        Long limit = userRepository.getUserLimit(checkUser.getUserId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        if (request.getAccTrsfLimit() > limit) {
-            throw new CustomException(LIMIT_MODIFY_FAIL);
-        }
-        // 비밀번호 체크
-        if (checkAccountByAccPwd(request.getAccCode(),request.getAccPwd())){
-            throw new CustomException(ACCOUNT_PWD_FAIL);
-        };
-        // 이체한도 수정
-        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        account.setAccTrsfLimit(request.getAccTrsfLimit());
-        return ApiResponse.success(ACCOUNT_LIMIT_MODIFY_SUCCESS);
-    }
-
 
    // 중복 함수 분리
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
