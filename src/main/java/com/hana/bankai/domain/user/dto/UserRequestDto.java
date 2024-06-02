@@ -2,8 +2,7 @@ package com.hana.bankai.domain.user.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 public class UserRequestDto {
@@ -33,6 +32,8 @@ public class UserRequestDto {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class Register {
         @NotEmpty(message = "ID를 입력하세요.")
         private String userId;
