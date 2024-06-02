@@ -59,20 +59,13 @@ public class ProductService {
     public ApiResponse<List<ProductResponseDto.GetProduct>> getProduct(int prodType) {
         ProdType prodTypeNum = ProdType.of(prodType);
         List<Product> productList = productRepository.findByProdType(prodTypeNum) ;
-        if (productList.size() == 0){
+        if (productList.isEmpty()){
             throw new CustomException(PRODUCT_NOT_SEARCH);
         }
         List<ProductResponseDto.GetProduct> productDtoList =  new ArrayList<>();
         for(Product p : productList){ // 3
-            ProductResponseDto.GetProduct dto = ProductResponseDto.GetProduct.builder()
-                    .prodCode(p.getProdCode())
-                    .prodName(p.getProdName())
-                    .prodPromo(p.getProdPromo())
-                    .joinMember(p.getJoinMember())
-                    .prodRate(p.getProdRate())
-                    .prodLimit(p.getProdLimit())
-                    .build();
-            productDtoList.add(dto); // 4
+            ProductResponseDto.GetProduct prodDto = ProductResponseDto.GetProduct.from(p);
+            productDtoList.add(prodDto); // 4
         }
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, productDtoList); // Pass the product object
     };
@@ -88,21 +81,13 @@ public class ProductService {
 
     public ApiResponse<List<ProductResponseDto.GetTopThree>> prodTopThree(){
         List<Product> getProdTopThree = productRepository.findTopProducts();
-
         if (getProdTopThree.size() == 0){
             throw new CustomException(PRODUCT_NOT_SEARCH);
         }
         List<ProductResponseDto.GetTopThree> productDtoList =  new ArrayList<>();
-        for(Product p : getProdTopThree){ // 3
-            ProductResponseDto.GetTopThree dto = ProductResponseDto.GetTopThree.builder()
-                    .prodCode(p.getProdCode())
-                    .prodName(p.getProdName())
-                    .prodRate(p.getProdRate())
-                    .prodLimit(p.getProdLimit())
-                    .joinPeriod(p.getJoinPeriod())
-                    .prodDesc(p.getProdDesc())
-                    .build();
-            productDtoList.add(dto); // 4
+        for(Product p : getProdTopThree){
+            ProductResponseDto.GetTopThree prodDto = ProductResponseDto.GetTopThree.from(p);
+            productDtoList.add(prodDto);
         }
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS,productDtoList);
     }
@@ -112,9 +97,9 @@ public class ProductService {
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH)
         );
         List<ProductResponseDto.GetProdSearch> productDtoList =  new ArrayList<>();
-        for(Product p : getProdSearch){ // 3
+        for(Product p : getProdSearch){
             ProductResponseDto.GetProdSearch prodDto = ProductResponseDto.GetProdSearch.from(p);
-            productDtoList.add(prodDto); // 4
+            productDtoList.add(prodDto);
         }
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS,productDtoList);
     }
