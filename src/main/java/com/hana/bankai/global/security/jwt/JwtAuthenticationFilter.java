@@ -30,26 +30,26 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        log.info("Start JwtAuthenticationFilter -------------------------------------------1");
+        log.info("Start JwtAuthenticationFilter: Request Header 에서 JWT 토큰을 추출합니다.");
         // 1. Request Header 에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
 
         // 2. validateToken 으로 토큰 유효성 검사
+        log.info("Start JwtAuthenticationFilter: validateToken 으로 토큰 유효성 검사를 실시합니다.");
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            log.info("Start JwtAuthenticationFilter -------------------------------------------2");
-
             // Redis 에 해당 accessToken logout 여부 확인
             String isLogout = (String) redisTemplate.opsForValue().get(token);
-            log.info("Start isLogout -------------------------------------------4 " + isLogout);
-            log.info("Start isLogout -------------------------------------------5 " + ObjectUtils.isEmpty(isLogout));
+            log.info("Start isLogout: logout 여부를 확인합니다.");
+            log.info("isLogout = {}", isLogout);
+            log.info("ObjectUtils.isEmpty(isLogout) = {}", ObjectUtils.isEmpty(isLogout));
 
 
             if (ObjectUtils.isEmpty(isLogout)) {
                 // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장
+                log.info("Start JwtAuthenticationFilter: 토큰이 유효하여 토큰에서 Authentication 객체를 불러와 SecurityContext 에 저장합니다.");
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                // getName은 사용자의 ID를 의미
-                log.info("Start JwtAuthenticationFilter -------------------------------------------6 " + authentication.getName());
-                log.info("Start JwtAuthenticationFilter -------------------------------------------6 " + authentication.getAuthorities());
+                log.info("authentication.getName() = {}", authentication.getName()); // getName은 사용자의 ID를 의미
+                log.info("authentication.getAuthorities() = {}", authentication.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

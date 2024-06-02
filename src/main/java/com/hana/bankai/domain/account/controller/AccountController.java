@@ -25,7 +25,8 @@ public class AccountController {
 
     @Operation(summary = "계좌 잔액 조회")
     @GetMapping("/balance")
-    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestParam("acc") String accCode, @AuthenticationPrincipal UserDetails user) {
+    public ApiResponse<AccountResponseDto.GetBalance> getBalance(@RequestParam("acc") String accCode,
+                                                                 @AuthenticationPrincipal UserDetails user) {
         return accountService.getBalance(accCode, user.getUsername());
     }
 
