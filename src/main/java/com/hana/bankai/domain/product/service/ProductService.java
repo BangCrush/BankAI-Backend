@@ -34,7 +34,7 @@ public class ProductService {
     public ApiResponse<ProductResponseDto.GetProductDetail> getProductDetail(Long prodCode) {
 
         Product p = productRepository.findById(prodCode)
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
         ProductResponseDto.GetProductDetail dto = ProductResponseDto.GetProductDetail.builder()
         .prodCode(p.getProdCode())
         .prodType(p.getProdType())

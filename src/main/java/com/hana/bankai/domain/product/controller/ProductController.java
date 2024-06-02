@@ -37,7 +37,7 @@ public class ProductController {
 
         return productService.getProduct(prodType);
     }
-    @Operation(summary = "상품 타입 별 조회")
+    @Operation(summary = "상품 별 상세 조회")
     @GetMapping("/detail")
     public ApiResponse<ProductResponseDto.GetProductDetail> detailProd(@RequestParam("code") Long productCode) {
         return productService.getProductDetail(productCode);
