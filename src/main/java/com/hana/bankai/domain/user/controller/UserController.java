@@ -47,11 +47,11 @@ public class UserController {
 
     @Operation(summary = "회원가입")
     @PostMapping("/register")
-    public ApiResponse<Object> register(@Validated @RequestBody UserRequestDto.Register request, Errors errors) {
+    public ApiResponse<Object> register(@RequestBody UserRequestDto.Register request) {
         // validation check
-        if(errors.hasErrors()) {
-            throw new CustomException(USER_REGISTER_VALIDATION_FAIL);
-        }
+//        if(errors.hasErrors()) {
+//            throw new CustomException(USER_REGISTER_VALIDATION_FAIL);
+//        }
 
         return userService.register(request);
     }
