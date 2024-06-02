@@ -106,5 +106,17 @@ public class ProductService {
         }
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS,productDtoList);
     }
+
+    public ApiResponse<List<ProductResponseDto.GetProdSearch>> getProdSearch(String keyword) {
+        List<Product> getProdSearch = productRepository.findByProdNameContaining(keyword)
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH)
+        );
+        List<ProductResponseDto.GetProdSearch> productDtoList =  new ArrayList<>();
+        for(Product p : getProdSearch){ // 3
+            ProductResponseDto.GetProdSearch prodDto = ProductResponseDto.GetProdSearch.from(p);
+            productDtoList.add(prodDto); // 4
+        }
+        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS,productDtoList);
+    }
 }
 

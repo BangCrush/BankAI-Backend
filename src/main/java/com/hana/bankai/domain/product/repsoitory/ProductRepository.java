@@ -25,6 +25,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LIMIT 3", nativeQuery = true)
     List<Product> findTopProducts();
 
+    Optional<List<Product>> findByProdNameContaining(String keyword);
+
 
 
 }

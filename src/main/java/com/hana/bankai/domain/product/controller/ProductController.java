@@ -47,4 +47,9 @@ public class ProductController {
     public ApiResponse<List<ProductResponseDto.GetTopThree>> getProdTopThree() {
         return productService.prodTopThree();
     }
+    @Operation(summary = "상품명 검색")
+    @GetMapping("/search")
+    public ApiResponse<List<ProductResponseDto.GetProdSearch>> getProdSearch(@RequestParam("keyword") String keyword) {
+        return productService.getProdSearch(keyword);
+    }
 }

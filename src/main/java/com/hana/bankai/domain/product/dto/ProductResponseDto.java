@@ -3,6 +3,7 @@ package com.hana.bankai.domain.product.dto;
 import com.hana.bankai.domain.product.entity.ProdAcc;
 import com.hana.bankai.domain.product.entity.ProdRepay;
 import com.hana.bankai.domain.product.entity.ProdType;
+import com.hana.bankai.domain.product.entity.Product;
 import lombok.*;
 
 
@@ -53,6 +54,31 @@ public class ProductResponseDto {
         private double prodRate;
         private Long prodLimit;
         private String prodDesc;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class GetProdSearch {
+        private Long prodCode;
+        private String prodName;
+        private String prodDesc;
+        private int joinPeriod;
+        private double prodRate;
+        private Long prodLimit;
+
+        // from 메소드 정의
+        public static ProductResponseDto.GetProdSearch from(Product prodEntity) {
+            return new ProductResponseDto.GetProdSearch(
+                    prodEntity.getProdCode(),
+                    prodEntity.getProdName(),
+                    prodEntity.getProdDesc(),
+                    prodEntity.getJoinPeriod(),
+                    prodEntity.getProdRate(),
+                    prodEntity.getProdLimit()
+                    );
+        }
+
     }
 
 }
