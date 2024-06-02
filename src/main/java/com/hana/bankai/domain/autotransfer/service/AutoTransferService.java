@@ -38,12 +38,12 @@ public class AutoTransferService {
             String userId = outAccount.getUser().getUserId();
 
             // 이체(Transfer) DTO 생성
-            AccountRequestDto.Transfer transfer = AccountRequestDto.Transfer.builder()
-                    .inAccCode(autoTransfer.getAutoTransferId().getInAccCode())
-                    .inBankCode(autoTransfer.getInBankCode())
-                    .outAccCode(autoTransfer.getAutoTransferId().getOutAccCode())
-                    .amount(autoTransfer.getAtAmount())
-                    .build();
+            AccountRequestDto.Transfer transfer = AccountRequestDto.Transfer.of(
+                    autoTransfer.getAutoTransferId().getInAccCode(),
+                    autoTransfer.getInBankCode(),
+                    autoTransfer.getAutoTransferId().getOutAccCode(),
+                    autoTransfer.getAtAmount()
+            );
 
             // 이체 Service 호출
             accountService.transfer(transfer, userId);

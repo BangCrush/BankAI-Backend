@@ -1,14 +1,7 @@
 package com.hana.bankai.domain.account.dto;
 
-
 import com.hana.bankai.global.common.enumtype.BankCode;
 import lombok.*;
-
-import com.hana.bankai.domain.account.entity.Account;
-import lombok.*;
-import lombok.extern.java.Log;
-
-import java.util.UUID;
 
 public class AccountRequestDto {
 
@@ -38,6 +31,15 @@ public class AccountRequestDto {
         private String outAccCode;
         private BankCode outBankCode;
         private Long amount;
+
+        public static Transfer of(String inAccCode, BankCode inBankCode, String outAccCode, Long amount ) {
+            return Transfer.builder()
+                    .inAccCode(inAccCode)
+                    .inBankCode(inBankCode)
+                    .outAccCode(outAccCode)
+                    .amount(amount)
+                    .build();
+        }
     }
 
     // 상품가입
@@ -46,14 +48,12 @@ public class AccountRequestDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class ProdJoinReq {
-//        private UUID userCode;
         private Long prodCode;
         private Long amount;
         private Long accTrsfLimit; // 이체 한도
         private String outAccount; // 출금 계좌 (적금일 땐 자동 이체 계좌)
         private String accountPwd;
         private int period;
-//        private int autoTransferte;
         // 자동 이체 (적금 또는 대출 상품일 때만 입력받음)
         private int atDate;
         private BankCode inBankCode;
@@ -67,5 +67,6 @@ public class AccountRequestDto {
         private String accCode;
         private Long accTrsfLimit;
         private String accPwd;
-    };
+    }
+
 }
