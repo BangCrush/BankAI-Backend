@@ -1,7 +1,5 @@
 package com.hana.bankai.domain.product.controller;
 
-import com.hana.bankai.domain.account.dto.AccountRequestDto;
-import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.product.dto.ProductResponseDto;
 import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.product.entity.Product;
@@ -14,9 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.hana.bankai.global.common.response.SuccessCode.PRODUCT_SEARCH_SUCCESS;
 
 @RestController
 @RequiredArgsConstructor
