@@ -87,9 +87,7 @@ public class ProductService {
     };
 
     public ApiResponse<List<ProductResponseDto.GetTopThree>> prodTopThree(){
-        List<Long> getProdTop = accountRepository.getProdTopThree();
-        List<Product> getProdTopThree = productRepository.findByProdCodes(getProdTop);
-        getProdTopThree.sort(Comparator.comparing(product -> getProdTop.indexOf(product.getProdCode())));
+        List<Product> getProdTopThree = productRepository.findTopProducts();
 
         if (getProdTopThree.size() == 0){
             throw new CustomException(PRODUCT_NOT_SEARCH);

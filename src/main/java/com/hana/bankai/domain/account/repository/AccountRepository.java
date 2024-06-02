@@ -22,9 +22,5 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     Optional<Account> findByAccCodeAndAccPwd(@Param("accCode") String accCode, @Param("accPwd") String accPwd);
     boolean existsByAccCode(String accCode);
 
-    // top3 상품 조회
-    @Query("select ap.product.prodCode, COUNT(ap.product.prodCode) as prodcnt from account ap group by ap.product.prodCode order by prodcnt desc limit 3")
-    List<Long> getProdTopThree();
-
 
 }
