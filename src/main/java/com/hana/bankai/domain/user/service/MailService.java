@@ -89,8 +89,6 @@ public class MailService {
         User user = userRepository.findByUserNameKrAndUserIdAndUserEmail(request.getUserNameKr(), request.getUserId(), request.getUserEmail())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        log.info("user = {}", user.toString());
-
         try {
             String password = sendTempPasswordMail(email);
 
