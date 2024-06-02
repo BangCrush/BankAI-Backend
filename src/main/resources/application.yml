@@ -64,6 +64,7 @@ springdoc:
         - "/register/**"
         - "/login/**"
         - "/logouts"
+        - "/users"
     - group: "account"
       display-name: "Account API"
       paths-to-match:
