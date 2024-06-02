@@ -19,6 +19,7 @@ public enum ErrorCode {
     USER_UPDATE_JOB_INFO_FAIL("E109", "직업 정보 수정 실패"),
     SEND_EMAIL_CODE_FAIL("E110", "이메일 인증 코드 전송 실패"),
     USER_ACCESS_FAIL("E111", "사용자 인가 실패"),
+    USER_REISSUE_FAIL("E112", "토큰 재발급 실패"),
 
     // Account
     ACCOUNT_NOT_FOUND("E200", "존재하지 않는 계좌입니다."),

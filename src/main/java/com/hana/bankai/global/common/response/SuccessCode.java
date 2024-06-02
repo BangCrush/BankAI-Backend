@@ -24,6 +24,7 @@ public enum SuccessCode {
     USER_GET_JOB_INFO_SUCCESS(OK, "직업 정보 조회 성공"),
     USER_UPDATE_JOB_INFO_SUCCESS(OK, "직장 정보 수정 성공"),
     SEND_EMAIL_CODE_SUCCESS(OK, "이메일 인증 코드 전송 성공"),
+    USER_REISSUE_SUCCESS(OK, "토큰 재발급 성공"),
 
     // Account
     ACCOUNT_CREATE_SUCCESS(CREATED,"계좌 개설 성공"),
