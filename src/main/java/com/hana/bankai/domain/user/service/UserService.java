@@ -198,14 +198,6 @@ public class UserService implements UserDetailsService {
         return ApiResponse.success(USER_FIND_ID_SUCCESS, new UserResponseDto.LoginFindId(userId));
     }
 
-    // 비밀번호 조회
-    public ApiResponse<UserResponseDto.LoginFindPwd> loginFindPwd(UserRequestDto.LoginFindPwd request) {
-        String userPwd = userRepository.findUserPwdByUserNameKrAndUserIdAndUserEmail(request.getUserNameKr(), request.getUserId(), request.getUserEmail())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-        return ApiResponse.success(USER_FIND_PWD_SUCCESS, new UserResponseDto.LoginFindPwd(userPwd));
-    }
-
     // 로그아웃
     public ApiResponse<Object> logout(UserRequestDto.Logout logout) {
         // 1. Access Token 검증

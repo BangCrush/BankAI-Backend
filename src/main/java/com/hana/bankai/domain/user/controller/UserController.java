@@ -82,10 +82,10 @@ public class UserController {
         return userService.loginFindId(request);
     }
 
-    @Operation(summary = "비밀번호 찾기")
-    @PostMapping("/login/find-pwd")
-    public ApiResponse<UserResponseDto.LoginFindPwd> loginFindId(@RequestBody UserRequestDto.LoginFindPwd request) {
-        return userService.loginFindPwd(request);
+    @Operation(summary = "임시 비밀번호 발급")
+    @PostMapping("/login/temp-pwd")
+    public ApiResponse<UserResponseDto.LoginTempPwd> tempPassword(@RequestParam("email") String email, @RequestBody UserRequestDto.LoginTempPwd request) {
+        return mailService.tempPasswordEmail(email, request);
     }
 
     /* logout */

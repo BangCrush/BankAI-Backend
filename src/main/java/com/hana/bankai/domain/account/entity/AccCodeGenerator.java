@@ -1,12 +1,8 @@
 package com.hana.bankai.domain.account.entity;
 
-import com.hana.bankai.domain.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.id.IdentifierGenerator;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.security.SecureRandom;
 
 @RequiredArgsConstructor
