@@ -3,6 +3,7 @@ package com.hana.bankai.domain.account.controller;
 import com.hana.bankai.domain.account.dto.AccountRequestDto;
 import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.service.AccountService;
+import com.hana.bankai.domain.accounthistory.entity.HisType;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,7 +52,7 @@ public class AccountController {
     @Operation(summary = "계좌이체")
     @PostMapping("/transfer")
     public ApiResponse transfer(@RequestBody AccountRequestDto.Transfer request, @AuthenticationPrincipal UserDetails user) {
-        return accountService.transfer(request, user.getUsername());
+        return accountService.transfer(request, user.getUsername(), HisType.TRANSFER);
     }
 
     @Operation(summary = "거래내역 조회")
