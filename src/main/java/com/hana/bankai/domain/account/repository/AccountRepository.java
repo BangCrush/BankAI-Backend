@@ -18,10 +18,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("select a.accPwd from account a where a.accCode = :accCode")
     Optional<String> findAccPwdByAccCode(@Param("accCode") String accCode);
 
-    @Query("SELECT a FROM account a WHERE a.accCode = :accCode AND a.accPwd = :accPwd")
-    Optional<Account> findByAccCodeAndAccPwd(@Param("accCode") String accCode, @Param("accPwd") String accPwd);
+    Optional<Account> findByAccCode(String accCode);
 
     boolean existsByAccCode(String accCode);
-
-
 }
