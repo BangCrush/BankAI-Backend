@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
     // 회원가입 여부 확인
-    Boolean existsByUserInherentNumber(String userInherentNumber);
+    Boolean existsByUserNameKrAndUserPhone(String userNameKr, String userPhone);
 
     // 중복 이메일 확인
     Boolean existsByUserEmail(String userEmail);
