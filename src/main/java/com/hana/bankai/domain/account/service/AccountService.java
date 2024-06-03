@@ -180,7 +180,6 @@ public class AccountService {
             accCode = accCodeGenerator.generateAccCode();
         } while (accountRepository.existsByAccCode(accCode));
 
-
         savedAccount = Account.builder()
                 .accCode(accCode)
                 .user(userEntity)
@@ -191,24 +190,17 @@ public class AccountService {
                 .accPwd(passwordEncoder.encode(request.getAccountPwd()))
                 .status(ACTIVE)
                 .build();
-
         accountRepository.save(savedAccount);
 
+        //이체
         String prodType = String.valueOf(productEntity.getProdType());
         if (prodType.equals("SAVINGS") || prodType.equals("LOAN")  ){
             // 자동 이체 설정 (적금 또는 대출일 때만)
             setAutoTransfer(request, productEntity, savedAccount);
         }
         if (prodType.equals("DEPOSIT")){
-            // 예금상품일경우 주거래은행에서 돈 빼오기.
-            AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
-                    .inAccCode(accCode)
-                    .inBankCode(C04)
-                    .outAccCode(userEntity.getUserMainAcc())
-                    .outBankCode(C04)
-                    .amount(request.getAmount()
-                    ).build();
-            transfer(transferAccount,userId);
+            // 예금 상품일경우 주거래은행에서 돈 출금
+            setDepositTransfer(accCode, userEntity, request, userId);
         }
         AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
         return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
@@ -281,6 +273,18 @@ public class AccountService {
             autoTransferRepository.save(autoTransfer);
         }
     }
+    private void setDepositTransfer(String accCode,User userEntity,
+                                    AccountRequestDto.ProdJoinReq request, String userId){
+        AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
+                .inAccCode(accCode)
+                .inBankCode(C04)
+                .outAccCode(userEntity.getUserMainAcc())
+                .outBankCode(C04)
+                .amount(request.getAmount())
+                .build();
+        transfer(transferAccount,userId);
+    }
+
 
    // 중복 함수 분리
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
