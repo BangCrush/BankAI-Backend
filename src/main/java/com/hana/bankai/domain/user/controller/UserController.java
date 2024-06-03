@@ -128,4 +128,9 @@ public class UserController {
         return mailService.authenticateEmail(email);
     }
 
+    @Operation(summary = "휴대폰 인증번호 발송")
+    @PostMapping("/register/sms-certification/send")
+    public ApiResponse sendSms(@RequestBody UserRequestDto.SmsCertificate request) {
+        return userService.sendSms(request.getUserPhone());
+    }
 }

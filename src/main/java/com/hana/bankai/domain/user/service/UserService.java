@@ -6,9 +6,11 @@ import com.hana.bankai.domain.user.entity.Role;
 import com.hana.bankai.domain.user.entity.User;
 import com.hana.bankai.domain.user.entity.UserJob;
 import com.hana.bankai.domain.user.entity.UserTrsfLimit;
+import com.hana.bankai.domain.user.repository.SmsCertification;
 import com.hana.bankai.domain.user.repository.UserJobRepository;
 import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.repository.UserTrsfLimitRepository;
+import com.hana.bankai.domain.user.util.SmsUtil;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import com.hana.bankai.global.security.jwt.JwtTokenProvider;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static com.hana.bankai.global.common.response.SuccessCode.*;
@@ -45,6 +48,8 @@ public class UserService implements UserDetailsService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisTemplate redisTemplate;
+    private final SmsUtil smsUtil;
+    private final SmsCertification smsCertification;
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
@@ -278,4 +283,25 @@ public class UserService implements UserDetailsService {
         return ApiResponse.success(USER_UPDATE_JOB_INFO_SUCCESS);
     }
 
+    public ApiResponse sendSms(String userPhone) {
+        try {
+            String verificationCode = getVerificationCode();
+            smsUtil.sendOne(userPhone, verificationCode);
+            smsCertification.createSmsCertification(userPhone, verificationCode);
+        } catch (Exception e) {
+            throw new CustomException(SMS_SEND_FAIL);
+        }
+        return ApiResponse.success(SEND_SMS_SUCCESS);
+    }
+
+    private String getVerificationCode() {
+        Random r = new Random();
+        String code = "";
+        for (int i = 0; i < 6; i++) {
+            String random = Integer.toString(r.nextInt(10));
+            code += random;
+        }
+
+        return code;
+    }
 }

@@ -162,4 +162,10 @@ public class UserRequestDto {
         private String companyPhone;
     }
 
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class SmsCertificate {
+        private String userPhone;
+    }
 }
