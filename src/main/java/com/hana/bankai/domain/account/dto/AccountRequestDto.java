@@ -57,6 +57,7 @@ public class AccountRequestDto {
         // 자동 이체 (적금 또는 대출 상품일 때만 입력받음)
         private int atDate;
         private BankCode inBankCode;
+        private Long atAmount;
     }
 
     // 이체한도 수정

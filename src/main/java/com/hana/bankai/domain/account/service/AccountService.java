@@ -16,6 +16,7 @@ import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.service.UserTrsfLimitService;
 import com.hana.bankai.global.aop.DistributedLock;
 import com.hana.bankai.domain.product.entity.Product;
+import com.hana.bankai.global.common.enumtype.BankCode;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.List;
 import static com.hana.bankai.domain.account.entity.AccStatus.ACTIVE;
 import static com.hana.bankai.domain.account.entity.AccStatus.DELETED;
 import static com.hana.bankai.domain.accounthistory.entity.HisType.*;
+import static com.hana.bankai.global.common.enumtype.BankCode.C04;
 import static com.hana.bankai.global.common.response.SuccessCode.*;
 import static com.hana.bankai.global.error.ErrorCode.*;
 
@@ -51,9 +53,9 @@ public class AccountService {
     final PlatformTransactionManager transactionManager;
     private final AccCodeGenerator accCodeGenerator;
     private final ProductRepository productRepository;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
     private final AutoTransferRepository autoTransferRepository;
-    private static final Long DEFAULT_ACCTRSFLIMIT = 300000L;
+    private static final Long DEFAULT_ACC_TRSF_LIMIT = 300000L;
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
         // 사용자 인증
@@ -83,7 +85,7 @@ public class AccountService {
     }
 
     public ApiResponse<AccountResponseDto.CheckRes> checkAccPw(AccountRequestDto.CheckAccPwd request) {
-        boolean isPwdValid = checkAccountByAccPwd(request.getAccCode(),request.getAccPwd());
+        boolean isPwdValid = checkAccountByAccPwd(request.getAccCode(), request.getAccPwd());
         return ApiResponse.success(ACCOUNT_PWD_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isPwdValid));
     }
 
@@ -165,11 +167,9 @@ public class AccountService {
     public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request, String userId) {
         // User 객체 불러오기
         User userEntity = getUserByUserId(userId);
-
         // Product 객체 불러오기
         Product productEntity = productRepository.findById(request.getProdCode())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
-
         // 만기일 설정을 위한 시간 조회
         LocalDate now = LocalDate.now();
 
@@ -179,38 +179,53 @@ public class AccountService {
         do {
             accCode = accCodeGenerator.generateAccCode();
         } while (accountRepository.existsByAccCode(accCode));
+
         savedAccount = Account.builder()
                 .accCode(accCode)
-                .user(userEntity)
                 .product(productEntity)
-                .accBalance(request.getAmount())
-                .accTrsfLimit(request.getAccTrsfLimit() != null ? request.getAccTrsfLimit() : DEFAULT_ACCTRSFLIMIT)
+                .user(userEntity)
                 .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
-                .accPwd(request.getAccountPwd())
+                .accBalance(request.getAmount())
+                .accTrsfLimit(request.getAccTrsfLimit() != null ? request.getAccTrsfLimit() : DEFAULT_ACC_TRSF_LIMIT)
+                .accPwd(passwordEncoder.encode(request.getAccountPwd()))
                 .status(ACTIVE)
                 .build();
-
         accountRepository.save(savedAccount);
 
-        // 자동 이체 설정 (적금 또는 대출일 때만)
-        setAutoTransfer(request, productEntity, savedAccount);
-
+        //이체
+        String prodType = String.valueOf(productEntity.getProdType());
+        if (prodType.equals("SAVINGS") || prodType.equals("LOAN")  ){
+            // 자동 이체 설정 (적금 또는 대출일 때만)
+            setAutoTransfer(request, productEntity, savedAccount);
+        }
+        if (prodType.equals("DEPOSIT")){
+            // 예금 상품일경우 주거래은행에서 돈 출금
+            setDepositTransfer(accCode, userEntity, request, userId);
+        }
         AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
         return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
     }
 
     // 계좌해지
-    public ApiResponse<Object> terminationAcc(AccountRequestDto.CheckAccPwd request){
-        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+    public ApiResponse<Object> terminationAcc(AccountRequestDto.CheckAccPwd request) {
+        // 계좌 조회
+        Account account = accountRepository.findByAccCode(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+
+        // 비밀번호 확인
+        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
+            throw new CustomException(ACCOUNT_PWD_FAIL);
+        };
+
         account.setStatus(DELETED);
         account.setAccBalance(0L);
+
         return ApiResponse.success(ACCOUNT_DELETE_SUCCESS);
     }
 
     // 이체한도 수정(각 계좌별)
     public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request,
-                                                  String userId){
+                                                  String userId) {
         // 회원 이체한도 보다 많을 수 없음 체크
         User checkUser = getUserByUserId(userId);
         Long limit = userRepository.getUserLimit(checkUser.getUserId())
@@ -220,14 +235,15 @@ public class AccountService {
             throw new CustomException(LIMIT_MODIFY_FAIL);
         }
 
-        // 비밀번호 체크
-        if (checkAccountByAccPwd(request.getAccCode(),request.getAccPwd())){
+        // 비밀번호 확인
+        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
             throw new CustomException(ACCOUNT_PWD_FAIL);
         };
 
         // 이체한도 수정
-        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+        Account account = accountRepository.findByAccCode(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+
         account.setAccTrsfLimit(request.getAccTrsfLimit());
         return ApiResponse.success(ACCOUNT_LIMIT_MODIFY_SUCCESS);
     }
@@ -249,7 +265,7 @@ public class AccountService {
             AutoTransfer autoTransfer = AutoTransfer.builder()
                     .autoTransferId(autoTransferId)
                     .inBankCode(request.getInBankCode())
-                    .atAmount(request.getAmount() / request.getPeriod()) // ex. 12개월 만기 120만원이면 매달 10만(120만/12)원씩 자동 이체
+                    .atAmount(request.getAtAmount())
                     .account(outAccount)
                     .build();
 
@@ -257,12 +273,25 @@ public class AccountService {
             autoTransferRepository.save(autoTransfer);
         }
     }
+    private void setDepositTransfer(String accCode,User userEntity,
+                                    AccountRequestDto.ProdJoinReq request, String userId){
+        AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
+                .inAccCode(accCode)
+                .inBankCode(C04)
+                .outAccCode(userEntity.getUserMainAcc())
+                .outBankCode(C04)
+                .amount(request.getAmount())
+                .build();
+        transfer(transferAccount,userId);
+    }
+
 
    // 중복 함수 분리
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        return accPwd.equals(accPwdCheck);
+
+        return passwordEncoder.matches(accPwd, accPwdCheck);
     }
 
     private User getUserByUserId(String userId) {
