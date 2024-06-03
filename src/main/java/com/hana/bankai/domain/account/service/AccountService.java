@@ -16,6 +16,7 @@ import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.service.UserTrsfLimitService;
 import com.hana.bankai.global.aop.DistributedLock;
 import com.hana.bankai.domain.product.entity.Product;
+import com.hana.bankai.global.common.enumtype.BankCode;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.List;
 import static com.hana.bankai.domain.account.entity.AccStatus.ACTIVE;
 import static com.hana.bankai.domain.account.entity.AccStatus.DELETED;
 import static com.hana.bankai.domain.accounthistory.entity.HisType.*;
+import static com.hana.bankai.global.common.enumtype.BankCode.C04;
 import static com.hana.bankai.global.common.response.SuccessCode.*;
 import static com.hana.bankai.global.error.ErrorCode.*;
 
@@ -165,11 +167,9 @@ public class AccountService {
     public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request, String userId) {
         // User 객체 불러오기
         User userEntity = getUserByUserId(userId);
-
         // Product 객체 불러오기
         Product productEntity = productRepository.findById(request.getProdCode())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
-
         // 만기일 설정을 위한 시간 조회
         LocalDate now = LocalDate.now();
 
@@ -179,6 +179,8 @@ public class AccountService {
         do {
             accCode = accCodeGenerator.generateAccCode();
         } while (accountRepository.existsByAccCode(accCode));
+
+
         savedAccount = Account.builder()
                 .accCode(accCode)
                 .user(userEntity)
@@ -192,9 +194,22 @@ public class AccountService {
 
         accountRepository.save(savedAccount);
 
-        // 자동 이체 설정 (적금 또는 대출일 때만)
-        setAutoTransfer(request, productEntity, savedAccount);
-
+        String prodType = String.valueOf(productEntity.getProdType());
+        if (prodType.equals("SAVINGS") || prodType.equals("LOAN")  ){
+            // 자동 이체 설정 (적금 또는 대출일 때만)
+            setAutoTransfer(request, productEntity, savedAccount);
+        }
+        if (prodType.equals("DEPOSIT")){
+            // 예금상품일경우 주거래은행에서 돈 빼오기.
+            AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
+                    .inAccCode(accCode)
+                    .inBankCode(C04)
+                    .outAccCode(userEntity.getUserMainAcc())
+                    .outBankCode(C04)
+                    .amount(request.getAmount()
+                    ).build();
+            transfer(transferAccount,userId);
+        }
         AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
         return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
     }
