@@ -85,12 +85,12 @@ public class MailService {
     private final PasswordGenerator passwordGenerator;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public ApiResponse<UserResponseDto.LoginTempPwd> tempPasswordEmail(String email, UserRequestDto.LoginTempPwd request) {
+    public ApiResponse<UserResponseDto.LoginTempPwd> tempPasswordEmail(UserRequestDto.LoginTempPwd request) {
         User user = userRepository.findByUserNameKrAndUserIdAndUserEmail(request.getUserNameKr(), request.getUserId(), request.getUserEmail())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         try {
-            String password = sendTempPasswordMail(email);
+            String password = sendTempPasswordMail(user.getUserEmail());
 
             // 임시 비밀번호(암호화) DB 저장
             userRepository.updateUserPwd(user.getUserCode(), passwordEncoder.encode(password));
