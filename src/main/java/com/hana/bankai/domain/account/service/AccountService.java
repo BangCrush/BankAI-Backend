@@ -51,7 +51,7 @@ public class AccountService {
     final PlatformTransactionManager transactionManager;
     private final AccCodeGenerator accCodeGenerator;
     private final ProductRepository productRepository;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
     private final AutoTransferRepository autoTransferRepository;
     private static final Long DEFAULT_ACCTRSFLIMIT = 300000L;
 
@@ -83,7 +83,7 @@ public class AccountService {
     }
 
     public ApiResponse<AccountResponseDto.CheckRes> checkAccPw(AccountRequestDto.CheckAccPwd request) {
-        boolean isPwdValid = checkAccountByAccPwd(request.getAccCode(),request.getAccPwd());
+        boolean isPwdValid = checkAccountByAccPwd(request.getAccCode(), request.getAccPwd());
         return ApiResponse.success(ACCOUNT_PWD_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isPwdValid));
     }
 
@@ -187,7 +187,7 @@ public class AccountService {
                 .accBalance(request.getAmount())
                 .accTrsfLimit(request.getAccTrsfLimit() != null ? request.getAccTrsfLimit() : DEFAULT_ACCTRSFLIMIT)
                 .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
-                .accPwd(request.getAccountPwd())
+                .accPwd(passwordEncoder.encode(request.getAccountPwd()))
                 .status(ACTIVE)
                 .build();
 
@@ -201,17 +201,25 @@ public class AccountService {
     }
 
     // 계좌해지
-    public ApiResponse<Object> terminationAcc(AccountRequestDto.CheckAccPwd request){
-        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+    public ApiResponse<Object> terminationAcc(AccountRequestDto.CheckAccPwd request) {
+        // 계좌 조회
+        Account account = accountRepository.findByAccCode(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+
+        // 비밀번호 확인
+        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
+            throw new CustomException(ACCOUNT_PWD_FAIL);
+        };
+
         account.setStatus(DELETED);
         account.setAccBalance(0L);
+
         return ApiResponse.success(ACCOUNT_DELETE_SUCCESS);
     }
 
     // 이체한도 수정(각 계좌별)
     public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request,
-                                                  String userId){
+                                                  String userId) {
         // 회원 이체한도 보다 많을 수 없음 체크
         User checkUser = getUserByUserId(userId);
         Long limit = userRepository.getUserLimit(checkUser.getUserId())
@@ -221,14 +229,15 @@ public class AccountService {
             throw new CustomException(LIMIT_MODIFY_FAIL);
         }
 
-        // 비밀번호 체크
-        if (checkAccountByAccPwd(request.getAccCode(),request.getAccPwd())){
+        // 비밀번호 확인
+        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
             throw new CustomException(ACCOUNT_PWD_FAIL);
         };
 
         // 이체한도 수정
-        Account account = accountRepository.findByAccCodeAndAccPwd(request.getAccCode(),request.getAccPwd())
+        Account account = accountRepository.findByAccCode(request.getAccCode())
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+
         account.setAccTrsfLimit(request.getAccTrsfLimit());
         return ApiResponse.success(ACCOUNT_LIMIT_MODIFY_SUCCESS);
     }
@@ -250,7 +259,7 @@ public class AccountService {
             AutoTransfer autoTransfer = AutoTransfer.builder()
                     .autoTransferId(autoTransferId)
                     .inBankCode(request.getInBankCode())
-                    .atAmount(request.getAmount() / request.getPeriod()) // ex. 12개월 만기 120만원이면 매달 10만(120만/12)원씩 자동 이체
+                    .atAmount(request.getAmount() / request.getPeriod())
                     .account(outAccount)
                     .build();
 
@@ -263,7 +272,8 @@ public class AccountService {
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        return accPwd.equals(accPwdCheck);
+
+        return passwordEncoder.matches(accPwd, accPwdCheck);
     }
 
     private User getUserByUserId(String userId) {
