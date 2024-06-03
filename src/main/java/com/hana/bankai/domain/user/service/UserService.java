@@ -294,6 +294,14 @@ public class UserService implements UserDetailsService {
         return ApiResponse.success(SEND_SMS_SUCCESS);
     }
 
+    public ApiResponse verifySms(UserRequestDto.SmsVerify request) {
+        if (isVerify(request)) {
+            throw new CustomException(SMS_VERIFY_FAIL);
+        }
+        smsCertification.deleteSmsCertification(request.getUserPhone());
+        return ApiResponse.success(SEND_VERIFY_SUCCESS);
+    }
+
     private String getVerificationCode() {
         Random r = new Random();
         String code = "";
@@ -303,5 +311,10 @@ public class UserService implements UserDetailsService {
         }
 
         return code;
+    }
+
+    private boolean isVerify(UserRequestDto.SmsVerify request) {
+        return !(smsCertification.hasKey(request.getUserPhone()) &&
+                smsCertification.getSmsCertification(request.getUserPhone()).equals(request.getVerificationCode()));
     }
 }

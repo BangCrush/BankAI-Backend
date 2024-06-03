@@ -168,4 +168,12 @@ public class UserRequestDto {
     public static class SmsCertificate {
         private String userPhone;
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class SmsVerify {
+        private String userPhone;
+        private String verificationCode;
+    }
 }

@@ -27,6 +27,7 @@ public enum SuccessCode {
     USER_REISSUE_SUCCESS(OK, "토큰 재발급 성공"),
     SEND_EMAIL_TEMP_PASSWORD_SUCCESS(OK, "임시 비밀번호 발급 성공"),
     SEND_SMS_SUCCESS(OK, "휴대폰 인증번호 발송 성공"),
+    SEND_VERIFY_SUCCESS(OK, "휴대폰 인증번호 검증 성공"),
 
     // Account
     ACCOUNT_CREATE_SUCCESS(CREATED,"계좌 개설 성공"),
