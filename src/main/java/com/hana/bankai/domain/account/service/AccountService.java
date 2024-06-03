@@ -55,7 +55,7 @@ public class AccountService {
     private final ProductRepository productRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AutoTransferRepository autoTransferRepository;
-    private static final Long DEFAULT_ACCTRSFLIMIT = 300000L;
+    private static final Long DEFAULT_ACC_TRSF_LIMIT = 300000L;
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
         // 사용자 인증
@@ -182,11 +182,11 @@ public class AccountService {
 
         savedAccount = Account.builder()
                 .accCode(accCode)
-                .user(userEntity)
                 .product(productEntity)
-                .accBalance(request.getAmount())
-                .accTrsfLimit(request.getAccTrsfLimit() != null ? request.getAccTrsfLimit() : DEFAULT_ACCTRSFLIMIT)
+                .user(userEntity)
                 .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
+                .accBalance(request.getAmount())
+                .accTrsfLimit(request.getAccTrsfLimit() != null ? request.getAccTrsfLimit() : DEFAULT_ACC_TRSF_LIMIT)
                 .accPwd(passwordEncoder.encode(request.getAccountPwd()))
                 .status(ACTIVE)
                 .build();
@@ -265,7 +265,7 @@ public class AccountService {
             AutoTransfer autoTransfer = AutoTransfer.builder()
                     .autoTransferId(autoTransferId)
                     .inBankCode(request.getInBankCode())
-                    .atAmount(request.getAmount() / request.getPeriod())
+                    .atAmount(request.getAtAmount())
                     .account(outAccount)
                     .build();
 
