@@ -5,6 +5,7 @@ import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.entity.AccCodeGenerator;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.repository.AccountRepository;
+import com.hana.bankai.domain.accounthistory.entity.HisType;
 import com.hana.bankai.domain.accounthistory.service.AccHisService;
 import com.hana.bankai.domain.autotransfer.entity.AutoTransfer;
 import com.hana.bankai.domain.autotransfer.entity.AutoTransferId;
@@ -16,13 +17,11 @@ import com.hana.bankai.domain.user.repository.UserRepository;
 import com.hana.bankai.domain.user.service.UserTrsfLimitService;
 import com.hana.bankai.global.aop.DistributedLock;
 import com.hana.bankai.domain.product.entity.Product;
-import com.hana.bankai.global.common.enumtype.BankCode;
 import com.hana.bankai.global.common.response.ApiResponse;
 import com.hana.bankai.global.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -89,7 +88,7 @@ public class AccountService {
     }
 
     @DistributedLock(key = "#request.getOutAccCode()")
-    public ApiResponse transfer(AccountRequestDto.Transfer request, String userId) {
+    public ApiResponse transfer(AccountRequestDto.Transfer request, String userId, HisType hisType) {
         User user = getUserByUserId(userId);
 
         Account outAcc = getAccByAccCode(request.getOutAccCode());
@@ -97,12 +96,15 @@ public class AccountService {
 
         // 사용자 인증 예외처리
         authenticateUser(user, outAcc.getUser());
+
         // 해지된 계좌 예외처리
         checkAccStatus(inAcc);
+
         // 유효하지 않은 이체 금액 예외처리
         if (request.getAmount() < 0) {
             throw new CustomException(INVALID_TRANSFER_AMOUNT);
         }
+
         // 이체한도 예외처리
         if (outAcc.getAccTrsfLimit() < request.getAmount() || trsfLimitService.checkTrsfLimit(user.getUserCode(), request.getAmount())) {
             throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
@@ -114,7 +116,7 @@ public class AccountService {
             bizLogic(outAcc, inAcc, request.getAmount());
             transactionManager.commit(status); // 성공 시 커밋
             // 계좌 로그 생성
-            accHisService.createAccHis(request.getAmount(), TRANSFER, inAcc, outAcc);
+            accHisService.createAccHis(request.getAmount(), hisType, inAcc, outAcc);
             // 사용자 이체 한도 > 누적 금액 수정
             trsfLimitService.accumulate(user.getUserCode(), request.getAmount());
         } catch (CustomException e) {
@@ -231,8 +233,7 @@ public class AccountService {
     }
 
     // 이체한도 수정(각 계좌별)
-    public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request,
-                                                  String userId) {
+    public ApiResponse<Object> accTrsfLimitModify(AccountRequestDto.TrsfLimitModify request, String userId) {
         // 회원 이체한도 보다 많을 수 없음 체크
         User checkUser = getUserByUserId(userId);
         Long limit = userRepository.getUserLimit(checkUser.getUserId())
@@ -280,8 +281,9 @@ public class AccountService {
             autoTransferRepository.save(autoTransfer);
         }
     }
-    private void setDepositTransfer(String accCode,User userEntity,
-                                    AccountRequestDto.ProdJoinReq request, String userId){
+
+    private void setDepositTransfer(String accCode, User userEntity,
+                                    AccountRequestDto.ProdJoinReq request, String userId) {
         AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
                 .inAccCode(accCode)
                 .inBankCode(C04)
@@ -289,9 +291,9 @@ public class AccountService {
                 .outBankCode(C04)
                 .amount(request.getAmount())
                 .build();
-        transfer(transferAccount,userId);
-    }
 
+        transfer(transferAccount, userId, TRANSFER);
+    }
 
    // 중복 함수 분리
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {

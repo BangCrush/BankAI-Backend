@@ -3,6 +3,7 @@ package com.hana.bankai.domain.autotransfer.service;
 import com.hana.bankai.domain.account.dto.AccountRequestDto;
 import com.hana.bankai.domain.account.entity.Account;
 import com.hana.bankai.domain.account.service.AccountService;
+import com.hana.bankai.domain.accounthistory.entity.HisType;
 import com.hana.bankai.domain.autotransfer.entity.AutoTransfer;
 import com.hana.bankai.domain.autotransfer.repository.AutoTransferRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class AutoTransferService {
             AccountRequestDto.Transfer transfer = AccountRequestDto.Transfer.from(autoTransfer);
 
             // 이체 Service 호출
-            accountService.transfer(transfer, userId);
+            accountService.transfer(transfer, userId, HisType.AUTO_TRANSFER);
         }
     }
 
