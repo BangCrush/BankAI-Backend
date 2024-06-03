@@ -84,8 +84,8 @@ public class UserController {
 
     @Operation(summary = "임시 비밀번호 발급")
     @PostMapping("/login/temp-pwd")
-    public ApiResponse<UserResponseDto.LoginTempPwd> tempPassword(@RequestParam("email") String email, @RequestBody UserRequestDto.LoginTempPwd request) {
-        return mailService.tempPasswordEmail(email, request);
+    public ApiResponse<UserResponseDto.LoginTempPwd> tempPassword(@RequestBody UserRequestDto.LoginTempPwd request) {
+        return mailService.tempPasswordEmail(request);
     }
 
     /* logout */

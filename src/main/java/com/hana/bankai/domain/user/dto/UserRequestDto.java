@@ -12,8 +12,11 @@ public class UserRequestDto {
     // 회원가입 여부 확인
     @Getter
     public static class RegisterCheck {
-        @NotEmpty(message = "주민등록번호는 필수 입력값입니다.")
-        private String userInherentNumber;
+        @NotEmpty(message = "이름을 입력하세요.")
+        private String userNameKr;
+
+        @NotEmpty(message = "휴대번호를 입력하세요.")
+        private String userPhone;
     }
 
     // 중복 이메일 확인

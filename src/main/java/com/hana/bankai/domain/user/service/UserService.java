@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
         // return value. 계정이 이미 존재하면 true, 아니면 false 반환
         Boolean value = false;
 
-        if (userRepository.existsByUserInherentNumber(request.getUserInherentNumber())) {
+        if (userRepository.existsByUserNameKrAndUserPhone(request.getUserNameKr(), request.getUserPhone())) {
             value = true;
         }
 
@@ -95,7 +95,7 @@ public class UserService implements UserDetailsService {
                 .userId(register.getUserId())
                 .userPwd(passwordEncoder.encode(register.getUserPwd()))
                 .userNameKr(register.getUserNameKr())
-                .userInherentNumber(register.getUserInherentNumber())
+                .userInherentNumber(register.getUserInherentNumber() + "******")
                 .userPhone(register.getUserPhone())
                 .userAddr(register.getUserAddr())
                 .userAddrDetail(register.getUserAddrDetail())

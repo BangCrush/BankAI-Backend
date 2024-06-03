@@ -55,10 +55,10 @@ public class Account {
     private LocalDate accJoinDate;
 
     @Column
-    @ColumnDefault("5000000000")
+    @ColumnDefault("300000")
     @Builder.Default()
     @Setter
-    private Long accTrsfLimit = 5000000000L;
+    private Long accTrsfLimit = 300000L;
 
     @Column
     @NotNull

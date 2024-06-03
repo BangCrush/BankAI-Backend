@@ -53,7 +53,7 @@ public class AccountService {
     private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final AutoTransferRepository autoTransferRepository;
-
+    private static final Long DEFAULT_ACCTRSFLIMIT = 300000L;
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
         // 사용자 인증
@@ -185,7 +185,7 @@ public class AccountService {
                 .user(userEntity)
                 .product(productEntity)
                 .accBalance(request.getAmount())
-                .accTrsfLimit(request.getAccTrsfLimit())
+                .accTrsfLimit(request.getAccTrsfLimit() != null ? request.getAccTrsfLimit() : DEFAULT_ACCTRSFLIMIT)
                 .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
                 .accPwd(request.getAccountPwd())
                 .status(ACTIVE)
