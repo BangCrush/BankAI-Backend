@@ -36,6 +36,11 @@ spring:
           auth: true
           starttls:
             enable: true
+coolsms:
+  api:
+    key: ENC(4NDR94cmjUGMOJG5WyXUqaLNzR/vdjxIoWF9VvY0rA4=)
+    secret: ENC(d0M0OltOqD99Oq88qTUQkkSVZSKID8LutQx6VMYQgFPqVLeFwDwB3m634vYDkk79)
+    sender: ENC(YurH1bS7/cHMF/zBOr1rULoHKDqlWSI9)
 
 jwt:
   secret: ENC(Nc28XGoNo/1g3LlvfKffOqNYPtDyBvStWb1oKvaSXSUN/TuvskfniY2kBHhOIbtkh41ewCtGcjgAizO+7Xjccg==)

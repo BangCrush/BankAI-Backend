@@ -74,6 +74,9 @@ dependencies {
 
     // smtp
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+
+    // nurigi 문자 인증
+    implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {
