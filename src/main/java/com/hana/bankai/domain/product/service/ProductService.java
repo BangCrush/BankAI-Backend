@@ -73,6 +73,9 @@ public class ProductService {
     // 전체 조회 코드(타입별로 나눠서 전체를 보내줌)
     public ApiResponse<Map<ProdType, List<Product>>> productSearchAll() {
         List<Product> allProduct = productRepository.findAll();
+        if (allProduct.isEmpty()){
+            throw new CustomException(PRODUCT_NOT_SEARCH);
+        }
         Map<ProdType,List<Product>> typeGroupProduct = allProduct.stream()
                 .collect(Collectors.groupingBy(Product::getProdType));
         return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, typeGroupProduct);
@@ -81,7 +84,7 @@ public class ProductService {
 
     public ApiResponse<List<ProductResponseDto.GetTopThree>> prodTopThree(){
         List<Product> getProdTopThree = productRepository.findTopProducts();
-        if (getProdTopThree.size() == 0){
+        if (getProdTopThree.isEmpty()){
             throw new CustomException(PRODUCT_NOT_SEARCH);
         }
         List<ProductResponseDto.GetTopThree> productDtoList =  new ArrayList<>();
