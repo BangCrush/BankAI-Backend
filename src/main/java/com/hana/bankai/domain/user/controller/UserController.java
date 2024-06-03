@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.hana.bankai.global.error.ErrorCode.USER_REGISTER_VALIDATION_FAIL;
+import static com.hana.bankai.global.error.ErrorCode.USER_REISSUE_FAIL;
 
 @Slf4j
 @RestController
@@ -64,23 +65,34 @@ public class UserController {
         return userService.login(request);
     }
 
+    @Operation(summary = "토큰 재발급")
+    @PostMapping("/login/reissue")
+    public ApiResponse<UserResponseDto.TokenInfo> reissue(@RequestBody UserRequestDto.Reissue reissue, Errors errors) {
+        // validation check -> ## 어떤 경우에 예외? 강사님께 여쭤보기 ##
+        if(errors.hasErrors()) {
+            throw new CustomException(USER_REISSUE_FAIL);
+        }
+
+        return userService.reissue(reissue);
+    }
+
     @Operation(summary = "아이디 찾기")
     @PostMapping("/login/find-id")
     public ApiResponse<UserResponseDto.LoginFindId> loginFindId(@RequestBody UserRequestDto.LoginFindId request) {
         return userService.loginFindId(request);
     }
 
-    @Operation(summary = "비밀번호 찾기")
-    @PostMapping("/login/find-pwd")
-    public ApiResponse<UserResponseDto.LoginFindPwd> loginFindId(@RequestBody UserRequestDto.LoginFindPwd request) {
-        return userService.loginFindPwd(request);
+    @Operation(summary = "임시 비밀번호 발급")
+    @PostMapping("/login/temp-pwd")
+    public ApiResponse<UserResponseDto.LoginTempPwd> tempPassword(@RequestParam("email") String email, @RequestBody UserRequestDto.LoginTempPwd request) {
+        return mailService.tempPasswordEmail(email, request);
     }
 
     /* logout */
 
     @Operation(summary = "로그아웃")
-    @PostMapping("/logouts")
-    public ApiResponse<Object> logout(@RequestBody UserRequestDto.Logout request) {
+    @PostMapping("/signout")
+    public ApiResponse<Object> signout(@RequestBody UserRequestDto.Logout request) {
         return userService.logout(request);
     }
 

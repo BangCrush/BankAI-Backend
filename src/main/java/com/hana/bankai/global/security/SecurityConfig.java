@@ -37,7 +37,7 @@ public class SecurityConfig {
             "/swagger-ui/**",        // Swagger UI에 대한 경로
             "/bankAi-docs/**",
             "/register/**",
-            "/login/**"
+            "/login/**",
     };
 
     @Bean

@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -152,40 +153,31 @@ public class UserService implements UserDetailsService {
         return ApiResponse.success(USER_LOGIN_SUCCESS, tokenInfo);
     }
 
-    // 아이디 조회
-    public ApiResponse<UserResponseDto.LoginFindId> loginFindId(UserRequestDto.LoginFindId request) {
-        String userId = userRepository.findUserIdByUserNameKrAndUserEmail(request.getUserNameKr(), request.getUserEmail())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-        return ApiResponse.success(USER_FIND_ID_SUCCESS, new UserResponseDto.LoginFindId(userId));
-    }
-
-    // 비밀번호 조회
-    public ApiResponse<UserResponseDto.LoginFindPwd> loginFindPwd(UserRequestDto.LoginFindPwd request) {
-        String userPwd = userRepository.findUserPwdByUserNameKrAndUserIdAndUserEmail(request.getUserNameKr(), request.getUserId(), request.getUserEmail())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-        return ApiResponse.success(USER_FIND_PWD_SUCCESS, new UserResponseDto.LoginFindPwd(userPwd));
-    }
-
-    /* token 재발급
-    public ResponseEntity<?> reissue(UserRequestDto.Reissue reissue) {
+    // 토큰 재발급
+    public ApiResponse<UserResponseDto.TokenInfo> reissue(UserRequestDto.Reissue reissue) {
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(reissue.getRefreshToken())) {
-            return response.fail("Refresh Token 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+            // message: "Refresh Token 정보가 유효하지 않습니다."
+            throw new CustomException(USER_REISSUE_FAIL);
         }
 
-        // 2. Access Token 에서 User email 을 가져옵니다.
+        // 2. Access Token 에서 User ID 을 가져옵니다.
         Authentication authentication = jwtTokenProvider.getAuthentication(reissue.getAccessToken());
+        log.info("*** Access Token 저장 정보 조회 1. authentication.getName() = {}", authentication.getName());
+//        log.info("*** Access Token 저장 정보 조회 2. authentication.getDetails().toString() = {}", authentication.getDetails().toString());
 
-        // 3. Redis 에서 User email 을 기반으로 저장된 Refresh Token 값을 가져옵니다.
+        // 3. Redis 에서 User ID 를 기반으로 저장된 Refresh Token 값을 가져옵니다.
         String refreshToken = (String) redisTemplate.opsForValue().get("RT:" + authentication.getName());
+
         // (추가) 로그아웃되어 Redis 에 RefreshToken 이 존재하지 않는 경우 처리
         if (ObjectUtils.isEmpty(refreshToken)) {
-            return response.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+            // message: "잘못된 요청입니다."
+            throw new CustomException(USER_REISSUE_FAIL);
         }
+
         if (!refreshToken.equals(reissue.getRefreshToken())) {
-            return response.fail("Refresh Token 정보가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+            // message: "Refresh Token 정보가 일치하지 않습니다."
+            throw new CustomException(USER_REISSUE_FAIL);
         }
 
         // 4. 새로운 토큰 생성
@@ -195,9 +187,16 @@ public class UserService implements UserDetailsService {
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return response.success(tokenInfo, "Token 정보가 갱신되었습니다.", HttpStatus.OK);
+        return ApiResponse.success(USER_REISSUE_SUCCESS, tokenInfo);
     }
-    */
+
+    // 아이디 조회
+    public ApiResponse<UserResponseDto.LoginFindId> loginFindId(UserRequestDto.LoginFindId request) {
+        String userId = userRepository.findUserIdByUserNameKrAndUserEmail(request.getUserNameKr(), request.getUserEmail())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        return ApiResponse.success(USER_FIND_ID_SUCCESS, new UserResponseDto.LoginFindId(userId));
+    }
 
     // 로그아웃
     public ApiResponse<Object> logout(UserRequestDto.Logout logout) {

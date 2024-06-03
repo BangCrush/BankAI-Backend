@@ -100,7 +100,7 @@ public class UserRequestDto {
     }
 
     @Getter
-    public static class LoginFindPwd {
+    public static class LoginTempPwd {
         @NotEmpty(message = "이름을 입력하세요.")
         private String userNameKr;
 

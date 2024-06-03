@@ -33,11 +33,11 @@ public class UserResponseDto {
         private String userId;
     }
 
-    // 비밀번호 찾기
+    // 임시 비밀번호 발급
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class LoginFindPwd {
+    public static class LoginTempPwd {
         private String userPwd;
     }
 
