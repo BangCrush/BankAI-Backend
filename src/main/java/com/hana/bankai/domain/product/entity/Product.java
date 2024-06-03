@@ -1,5 +1,6 @@
 package com.hana.bankai.domain.product.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.hana.bankai.domain.account.entity.Account;
 import jakarta.persistence.*;
@@ -83,8 +84,10 @@ public class Product {
     @NotNull
     private String prodTerms;
 
-    @OneToMany(mappedBy = "product") // One(product) to Many(account)
-    @JsonManagedReference // 순환 참조 해결
-    private final List<Account> accountList = new ArrayList<>();
+    // 사용하지 않은 테이블 매핑을 위한 연관관계
+//    @OneToMany(mappedBy = "product") // One(product) to Many(account)
+////    @JsonManagedReference // 순환 참조 해결
+//    @JsonBackReference
+//    private final List<Account> accountList = new ArrayList<>();
 
 }
