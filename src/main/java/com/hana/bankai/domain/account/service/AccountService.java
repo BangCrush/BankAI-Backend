@@ -263,7 +263,7 @@ public class AccountService {
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        return passwordEncoder.matches(accPwd, accPwdCheck);
+        return accPwd.equals(accPwdCheck);
     }
 
     private User getUserByUserId(String userId) {

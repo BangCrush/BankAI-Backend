@@ -16,8 +16,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByProdType(ProdType prodtype);
 
-    @Query("SELECT p FROM product p WHERE p.prodCode IN :prodCodes")
-    List<Product> findByProdCodes(@Param("prodCodes") List<Long> prodCodes);
+    // 상품 가입 top-three 쿼리
+    @Query(value = "SELECT p.* " +
+            "FROM product p " +
+            "Left Join account a ON p.prod_code = a.prod_code " +
+            "GROUP BY p.prod_code " +
+            "ORDER BY COUNT(a.prod_code) DESC " +
+            "LIMIT 3", nativeQuery = true)
+    List<Product> findTopProducts();
+
+    Optional<List<Product>> findByProdNameContaining(String keyword);
+
 
 
 }

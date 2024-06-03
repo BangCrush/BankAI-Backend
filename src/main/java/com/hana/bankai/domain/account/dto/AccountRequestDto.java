@@ -42,7 +42,6 @@ public class AccountRequestDto {
                     .build();
         }
     }
-
     // 상품가입
     @Builder
     @Getter
