@@ -78,6 +78,7 @@ public class AccountResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class GetAssets {
+        private String userName;
         private Long assets;
     }
     @Getter

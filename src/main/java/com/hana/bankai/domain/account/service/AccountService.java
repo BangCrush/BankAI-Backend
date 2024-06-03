@@ -140,7 +140,6 @@ public class AccountService {
     }
 
     public ApiResponse<AccountResponseDto.GetAssets> getAssets(String userId) {
-        // 로그인한 사용자 정보 불러오기 (개발 예정)
         User user = getUserByUserId(userId);
 
         Long assets = 0L;
@@ -148,7 +147,7 @@ public class AccountService {
             assets += acc.getAccBalance();
         }
 
-        return ApiResponse.success(USER_ASSETS_CHECK_SUCCESS, new AccountResponseDto.GetAssets(assets));
+        return ApiResponse.success(USER_ASSETS_CHECK_SUCCESS, new AccountResponseDto.GetAssets(user.getUserNameKr(), assets));
     }
 
     private void bizLogic(Account outAcc, Account inAcc, Long money) {
