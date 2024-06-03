@@ -55,7 +55,6 @@ public class AccountService {
     private final ProductRepository productRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AutoTransferRepository autoTransferRepository;
-    private static final Long DEFAULT_ACC_TRSF_LIMIT = 300000L;
 
     public ApiResponse<AccountResponseDto.GetBalance> getBalance(String accCode, String userId) {
         // 사용자 인증
@@ -165,11 +164,13 @@ public class AccountService {
 
     // 상품가입 (계좌개설)
     public ApiResponse<AccountResponseDto.JoinAcc> joinAcc(AccountRequestDto.ProdJoinReq request, String userId) {
-        // User 객체 불러오기
+        // User 객체 조회
         User userEntity = getUserByUserId(userId);
+
         // Product 객체 불러오기
         Product productEntity = productRepository.findById(request.getProdCode())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
+
         // 만기일 설정을 위한 시간 조회
         LocalDate now = LocalDate.now();
 
@@ -180,16 +181,22 @@ public class AccountService {
             accCode = accCodeGenerator.generateAccCode();
         } while (accountRepository.existsByAccCode(accCode));
 
-        savedAccount = Account.builder()
+        Account.AccountBuilder accountBuilder = Account.builder()
                 .accCode(accCode)
                 .product(productEntity)
                 .user(userEntity)
                 .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
-                .accBalance(request.getAmount())
-                .accTrsfLimit(request.getAccTrsfLimit() != null ? request.getAccTrsfLimit() : DEFAULT_ACC_TRSF_LIMIT)
                 .accPwd(passwordEncoder.encode(request.getAccountPwd()))
-                .status(ACTIVE)
-                .build();
+                .status(ACTIVE);
+
+        if (request.getAmount() != null)
+            accountBuilder.accBalance(request.getAmount());
+
+        if (request.getAccTrsfLimit() != null)
+            accountBuilder.accTrsfLimit(request.getAccTrsfLimit());
+
+        savedAccount = accountBuilder.build();
+
         accountRepository.save(savedAccount);
 
         //이체
