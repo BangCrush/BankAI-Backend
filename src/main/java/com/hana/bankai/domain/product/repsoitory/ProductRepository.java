@@ -19,7 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 상품 가입 top-three 쿼리
     @Query(value = "SELECT p.* " +
             "FROM product p " +
-            "JOIN account a ON p.prod_code = a.prod_code " +
+            "Left Join account a ON p.prod_code = a.prod_code " +
             "GROUP BY p.prod_code " +
             "ORDER BY COUNT(a.prod_code) DESC " +
             "LIMIT 3", nativeQuery = true)
