@@ -95,7 +95,7 @@ public class UserService implements UserDetailsService {
                 .userId(register.getUserId())
                 .userPwd(passwordEncoder.encode(register.getUserPwd()))
                 .userNameKr(register.getUserNameKr())
-                .userInherentNumber(register.getUserInherentNumber())
+                .userInherentNumber(register.getUserInherentNumber() + "******")
                 .userPhone(register.getUserPhone())
                 .userAddr(register.getUserAddr())
                 .userAddrDetail(register.getUserAddrDetail())
