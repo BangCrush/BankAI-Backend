@@ -88,6 +88,7 @@ public class AccountService {
     }
 
     @DistributedLock(key = "#request.getOutAccCode()")
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponse transfer(AccountRequestDto.Transfer request, String userId, HisType hisType) {
         User user = getUserByUserId(userId);
 
@@ -176,6 +177,9 @@ public class AccountService {
         // 만기일 설정을 위한 시간 조회
         LocalDate now = LocalDate.now();
 
+        // prodType 비교를 위함.
+        String prodType = String.valueOf(productEntity.getProdType());
+
         // 계좌 생성 및 계좌번호 중복 체크
         Account savedAccount;
         String accCode;
@@ -191,6 +195,9 @@ public class AccountService {
                 .accPwd(passwordEncoder.encode(request.getAccountPwd()))
                 .status(ACTIVE);
 
+        if (prodType.equals("DEPOSIT"))
+            accountBuilder.accBalance(0L);
+
         if (request.getAmount() != null)
             accountBuilder.accBalance(request.getAmount());
 
@@ -202,7 +209,7 @@ public class AccountService {
         accountRepository.save(savedAccount);
 
         //이체
-        String prodType = String.valueOf(productEntity.getProdType());
+
         if (prodType.equals("SAVINGS") || prodType.equals("LOAN")  ){
             // 자동 이체 설정 (적금 또는 대출일 때만)
             setAutoTransfer(request, productEntity, savedAccount);
@@ -282,6 +289,26 @@ public class AccountService {
         }
     }
 
+    public void rateTransfer() {
+        // Account DB Table 에서 입출금 데이터를 조회
+        List<Account> rateTransferList = accountRepository.findByProdCodeStartingWithOne();
+        for(Account rateTransfer : rateTransferList) {
+            if (rateTransfer.getAccCode().equals("04-59441-6954873")) continue;
+
+            // 단리식 이자 계산
+            double principal = rateTransfer.getAccBalance(); // 원금
+            double annualRate = rateTransfer.getProduct().getProdRate(); // 연 이율
+
+            double dailyRate = annualRate / 365; // 일 이율
+            double interest = principal * dailyRate * 30;
+            // 이자 소득세 차감
+            double taxRate = 0.154; // 15.4%
+            long netInterest = (long) (interest * (1 - taxRate));
+            // 이체 Service 호출
+            setRateTransfer(rateTransfer.getAccCode(),netInterest);
+        }
+    }
+
     private void setDepositTransfer(String accCode, User userEntity,
                                     AccountRequestDto.ProdJoinReq request, String userId) {
         AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
@@ -294,6 +321,19 @@ public class AccountService {
 
         transfer(transferAccount, userId, TRANSFER);
     }
+
+    @Transactional
+    protected void setRateTransfer(String accCode, Long netInterest){
+        AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
+                .inAccCode(accCode)
+                .inBankCode(C04)
+                .outAccCode("04-59441-6954873")
+                .outBankCode(C04)
+                .amount(netInterest)
+                .build();
+        transfer(transferAccount, "admin", PAY_INTEREST);
+    }
+
 
    // 중복 함수 분리
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
