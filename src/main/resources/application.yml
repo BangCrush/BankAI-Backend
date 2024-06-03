@@ -9,7 +9,7 @@ spring:
       password: ENC(91A7oHbACBzXVDccNZlf8QBrkocwo922) # 서버 redis 비밀번호
 
   datasource:
-    url: ENC(+Hw47OHHBD4u0hgOUM8Ui4vzWD8AwvEo9XRFIzys8rzZiSxYuzE9C5vESDHGflK6FGkSaTv3fQKHyZm/yzLtlznZS2jpG1AwtkvhTtvfm3rT2rnVZt0XMw==)
+    url: ENC(au0T6x8SfwbY6BZCyfWf8H46TwgqjR7gCHAqhzaGPD7AVaFSK4Zacvzi2kK3gc4AkpBoUb7C7tefrFLkq0ySuFdekUBacUb1xDfce9K6/phc0IbgCnArQQ==)
     username: ENC(5coC5RV8Dpf6qeHKDrKZuQ==)
     password: ENC(KDewUoWvVTcbeORnql1WAnmlB8USs29f)
     hikari:
