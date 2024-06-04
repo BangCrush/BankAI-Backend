@@ -33,11 +33,13 @@ public class Account {
     @ManyToOne
     @JoinColumn(name = "prod_code")
     @JsonBackReference
+    @ToString.Exclude // StackOverflowError 방지
     private Product product;
 
     @ManyToOne
     @JoinColumn(name = "user_code")
     @JsonBackReference
+    @ToString.Exclude // StackOverflowError 방지
     private User user;
 
     @Column
@@ -71,6 +73,7 @@ public class Account {
 
     @OneToMany(mappedBy = "account") // One(account) to Many(autotransfer)
     @JsonManagedReference // 순환 참조 해결
+    @ToString.Exclude // StackOverflowError 방지
     private final List<AutoTransfer> autoTransferList = new ArrayList<>();
 
     public Account transfer(Long amount) {

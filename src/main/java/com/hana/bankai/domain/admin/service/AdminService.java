@@ -1,6 +1,9 @@
 package com.hana.bankai.domain.admin.service;
 
 import com.hana.bankai.domain.account.repository.AccountRepository;
+import com.hana.bankai.domain.admin.dto.AdminResponseDto;
+import com.hana.bankai.domain.product.entity.ProdType;
+import com.hana.bankai.domain.product.entity.Product;
 import com.hana.bankai.domain.product.repsoitory.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.hana.bankai.domain.product.entity.ProdType.*;
 
@@ -46,4 +50,22 @@ public class AdminService {
         }
         return transformedData;
     }
+
+    public Map<ProdType, List<AdminResponseDto.ProductJoinCntByAgeGroup>> getBarChartData() {
+        List<Product> ProductList = productRepository.findAll();
+
+        Map<ProdType, List<AdminResponseDto.ProductJoinCntByAgeGroup>> response = divisionProdByType(ProductList);
+
+        return response;
+    }
+
+    private Map<ProdType, List<AdminResponseDto.ProductJoinCntByAgeGroup>> divisionProdByType(List<Product> productList) {
+        return productList.stream()
+                .collect(Collectors.groupingBy(
+                        Product::getProdType,
+                        Collectors.mapping(AdminResponseDto.ProductJoinCntByAgeGroup::from, Collectors.toList())
+                ));
+    }
+
+
 }

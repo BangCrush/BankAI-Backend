@@ -70,7 +70,6 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProdRepay prodRepay;
 
-
     @Column
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -84,10 +83,11 @@ public class Product {
     @NotNull
     private String prodTerms;
 
-    // 사용하지 않은 테이블 매핑을 위한 연관관계
-//    @OneToMany(mappedBy = "product") // One(product) to Many(account)
-////    @JsonManagedReference // 순환 참조 해결
-//    @JsonBackReference
-//    private final List<Account> accountList = new ArrayList<>();
+    // 상품에 가입된 계좌 정보 List
+    @OneToMany(mappedBy = "product") // One(product) to Many(account)
+//    @JsonManagedReference // 순환 참조 해결. but 동작 안 함. 왜?
+    @JsonBackReference // 순환 참조 해결
+    @ToString.Exclude // StackOverflowError 방지
+    private final List<Account> accountList = new ArrayList<>();
 
 }

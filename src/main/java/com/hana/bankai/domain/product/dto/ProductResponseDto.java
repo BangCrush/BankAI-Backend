@@ -6,7 +6,6 @@ import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.product.entity.Product;
 import lombok.*;
 
-
 public class ProductResponseDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,6 +16,7 @@ public class ProductResponseDto {
         private String prodPromo;
         private int joinPeriod;
         private double prodRate;
+
         // from 메소드 정의
         public static ProductResponseDto.GetProduct from(Product prodEntity) {
             return new ProductResponseDto.GetProduct(
@@ -28,6 +28,7 @@ public class ProductResponseDto {
             );
         }
     }
+
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
@@ -48,7 +49,6 @@ public class ProductResponseDto {
         private ProdAcc prodAcc;
         private String prodPromo;
         private String prodTerms;
-
     }
 
     @Getter
