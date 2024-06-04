@@ -56,31 +56,38 @@ public class ProductService {
     };
 
     // 상품 별 전체 조회 코드
-    public ApiResponse<List<ProductResponseDto.GetProduct>> getProduct(int prodType) {
+    public ApiResponse<Map<ProdType,List<ProductResponseDto.GetProduct>>> getProduct(int prodType) {
         ProdType prodTypeNum = ProdType.of(prodType);
         List<Product> productList = productRepository.findByProdType(prodTypeNum) ;
         if (productList.isEmpty()){
             throw new CustomException(PRODUCT_NOT_SEARCH);
         }
         List<ProductResponseDto.GetProduct> productDtoList =  new ArrayList<>();
-        for(Product p : productList){ // 3
+        for(Product p : productList){
             ProductResponseDto.GetProduct prodDto = ProductResponseDto.GetProduct.from(p);
-            productDtoList.add(prodDto); // 4
+            productDtoList.add(prodDto);
         }
-        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, productDtoList); // Pass the product object
+        Map<ProdType, List<ProductResponseDto.GetProduct>> prodTypeListMap = new HashMap<>();
+        prodTypeListMap.put(prodTypeNum, productDtoList);
+        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, prodTypeListMap); // Pass the product object
     };
 
     // 전체 조회 코드(타입별로 나눠서 전체를 보내줌)
-    public ApiResponse<Map<ProdType, List<Product>>> productSearchAll() {
+    public ApiResponse<Map<ProdType, List<ProductResponseDto.GetProduct>>> productSearchAll() {
         List<Product> allProduct = productRepository.findAll();
-        if (allProduct.isEmpty()){
+        if (allProduct.isEmpty()) {
             throw new CustomException(PRODUCT_NOT_SEARCH);
         }
-        Map<ProdType,List<Product>> typeGroupProduct = allProduct.stream()
-                .collect(Collectors.groupingBy(Product::getProdType));
-        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, typeGroupProduct);
 
-    };
+        Map<ProdType, List<ProductResponseDto.GetProduct>> responseMap = allProduct.stream()
+                .collect(Collectors.groupingBy(
+                        Product::getProdType,
+                        Collectors.mapping(ProductResponseDto.GetProduct::from, Collectors.toList())
+                ));
+
+        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, responseMap);
+    }
+
 
     public ApiResponse<List<ProductResponseDto.GetTopThree>> prodTopThree(){
         List<Product> getProdTopThree = productRepository.findTopProducts();
