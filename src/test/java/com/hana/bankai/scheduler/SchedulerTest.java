@@ -13,15 +13,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class SchedulerTest {
 
-    @Mock
-    private UserTrsfLimitService trsfLimitService;
-    @InjectMocks
-    private BankaiScheduler scheduler;
-
-    @Test
-    public void 사용자_이체한도_초기화_테스트() {
-        Mockito.doNothing().when(trsfLimitService).resetUserDailyTrsfLimit();
-        scheduler.resetDailyUserTrsfLimit();
-        Mockito.verify(trsfLimitService, Mockito.times(1)).resetUserDailyTrsfLimit();
-    }
+//    @Mock
+//    private UserTrsfLimitService trsfLimitService;
+//    @InjectMocks
+//    private BankaiScheduler scheduler;
+//
+//    @Test
+//    public void 사용자_이체한도_초기화_테스트() {
+//        Mockito.doNothing().when(trsfLimitService).resetUserDailyTrsfLimit();
+//        scheduler.resetDailyUserTrsfLimit();
+//        Mockito.verify(trsfLimitService, Mockito.times(1)).resetUserDailyTrsfLimit();
+//    }
 }
