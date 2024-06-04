@@ -2,6 +2,7 @@ package com.hana.bankai.account;
 
 import com.hana.bankai.domain.account.dto.AccountResponseDto;
 import com.hana.bankai.domain.account.service.AccountService;
+import com.hana.bankai.domain.accounthistory.entity.HisType;
 import com.hana.bankai.global.common.enumtype.BankCode;
 import com.hana.bankai.global.common.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +26,15 @@ public class AccTransferTest {
 //    @Test
 //    void 계좌이체_동시성_테스트() throws InterruptedException {
 //        // given
-//        ApiResponse<AccountResponseDto.GetBalance> outAcc = accountService.getBalance(AccCodeReq.builder().accCode("04-12345-1234567").build());
+//        ApiResponse<AccountResponseDto.GetBalance> outAcc = accountService.getBalance("04-23952-3659537", "soyeon");
 //        Long outAccBalance = outAcc.getData().getAccBalance();
-//        ApiResponse<AccountResponseDto.GetBalance> inAcc = accountService.getBalance(AccCodeReq.builder().accCode("04-12345-7654321").build());
+//        ApiResponse<AccountResponseDto.GetBalance> inAcc = accountService.getBalance("04-77825-0567386", "samsiclover");
 //        Long inAccBalance = inAcc.getData().getAccBalance();
 //
 //        Transfer transfer = Transfer.builder()
-//                .inAccCode("04-12345-7654321")
+//                .inAccCode("04-77825-0567386")
 //                .inBankCode(BankCode.C04)
-//                .outAccCode("04-12345-1234567")
+//                .outAccCode("04-23952-3659537")
 //                .outBankCode(BankCode.C04)
 //                .amount(100L)
 //                .build();
@@ -46,7 +47,7 @@ public class AccTransferTest {
 //        for (int i = 0; i < numberOfThreads; i++) {
 //            executorService.submit(() -> {
 //                try {
-//                    accountService.transfer(transfer);
+//                    accountService.transfer(transfer, "soyeon", HisType.TRANSFER);
 //                } finally {
 //                    latch.countDown();
 //                }
@@ -55,9 +56,9 @@ public class AccTransferTest {
 //        latch.await();
 //
 //        // then
-//        ApiResponse<AccountResponseDto.GetBalance> updatedOutAcc = accountService.getBalance(AccCodeReq.builder().accCode("04-12345-1234567").build());
+//        ApiResponse<AccountResponseDto.GetBalance> updatedOutAcc = accountService.getBalance("04-23952-3659537", "soyeon");
 //        Long updatedOutAccBalance = updatedOutAcc.getData().getAccBalance();
-//        ApiResponse<AccountResponseDto.GetBalance> updatedInAcc = accountService.getBalance(AccCodeReq.builder().accCode("04-12345-7654321").build());
+//        ApiResponse<AccountResponseDto.GetBalance> updatedInAcc = accountService.getBalance("04-77825-0567386", "samsiclover");
 //        Long updatedInAccBalance = updatedInAcc.getData().getAccBalance();
 //
 //        assertThat(updatedOutAccBalance).isEqualTo(outAccBalance - 100L * numberOfThreads);
