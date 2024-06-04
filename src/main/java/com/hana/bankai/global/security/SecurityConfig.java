@@ -38,6 +38,7 @@ public class SecurityConfig {
             "/bankAi-docs/**",
             "/register/**",
             "/login/**",
+            "/admin/**",
     };
 
     @Bean
