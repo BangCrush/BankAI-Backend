@@ -271,7 +271,7 @@ public class AccountService {
     // 자동 이체 설정
     private void setAutoTransfer(AccountRequestDto.ProdJoinReq request, Product product, Account savedAccount) {
         // 적금 또는 대출일 때만 실행
-        if(product.getProdType().equals(ProdType.SAVINGS) || product.getProdType().equals(ProdType.LOAN)) {
+        if(product.getProdType().equals(ProdType.SAVINGS)) {
             // 출금 계좌 조회
             Account outAccount = getAccByAccCode(request.getOutAccount());
 
