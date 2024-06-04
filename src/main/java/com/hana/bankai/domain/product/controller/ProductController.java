@@ -33,7 +33,7 @@ public class ProductController {
     }
     @Operation(summary = "상품 별 상세 조회")
     @GetMapping("/detail")
-    public ApiResponse<ProductResponseDto.GetProductDetail> detailProd(@RequestParam("code") Long productCode) {
+    public ApiResponse<Product> detailProd(@RequestParam("code") Long productCode) {
         return productService.getProductDetail(productCode);
     }
     @Operation(summary = "상품 TOP 3 조회")
@@ -43,7 +43,7 @@ public class ProductController {
     }
     @Operation(summary = "상품명 검색")
     @GetMapping("/search")
-    public ApiResponse<List<ProductResponseDto.GetProdSearch>> getProdSearch(@RequestParam("keyword") String keyword) {
+    public ApiResponse<Map<ProdType,List<ProductResponseDto.GetProduct>>> getProdSearch(@RequestParam("keyword") String keyword) {
         return productService.getProdSearch(keyword);
     }
 }
