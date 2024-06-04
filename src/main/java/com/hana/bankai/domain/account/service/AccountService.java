@@ -208,7 +208,7 @@ public class AccountService {
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
 
         // 비밀번호 확인
-        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
+        if (!checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
             throw new CustomException(ACCOUNT_PWD_FAIL);
         };
 
@@ -230,7 +230,7 @@ public class AccountService {
         }
 
         // 비밀번호 확인
-        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
+        if (!checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
             throw new CustomException(ACCOUNT_PWD_FAIL);
         };
 
@@ -256,11 +256,11 @@ public class AccountService {
                 .accPwd(passwordEncoder.encode(request.getAccountPwd()))
                 .status(ACTIVE);
 
-        if (prodType.equals("DEPOSIT"))
-            accountBuilder.accBalance(0L);
-
         if (request.getAmount() != null)
             accountBuilder.accBalance(request.getAmount());
+
+        if (prodType.equals("DEPOSIT"))
+            accountBuilder.accBalance(0L);
 
         if (request.getAccTrsfLimit() != null)
             accountBuilder.accTrsfLimit(request.getAccTrsfLimit());
