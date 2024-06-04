@@ -39,7 +39,9 @@ public enum ErrorCode {
     LOCK_INTERRUPTED_ERROR("E401", "락 획득 시 인터럽트 발생"),
 
     // Product
-    PRODUCT_NOT_SEARCH("E300","해당하는 상품을 찾을 수 없습니다")
+    PRODUCT_NOT_SEARCH("E300","해당하는 상품을 찾을 수 없습니다"),
+    AMOUNT_OUT_OF_RANGE("E301","납입 범위를 벗어납니다."),
+    MAX_AMOUNT_EXCEEDED("E302", "최대 납입 금액을 초과했습니다.")
     ;
 
     private final String code;

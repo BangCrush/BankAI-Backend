@@ -21,4 +21,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     Optional<Account> findByAccCode(String accCode);
 
     boolean existsByAccCode(String accCode);
+
+    @Query("SELECT a FROM account a WHERE str(a.product.prodCode) LIKE '1%'")
+    List<Account> findByProdCodeStartingWithOne();
 }
