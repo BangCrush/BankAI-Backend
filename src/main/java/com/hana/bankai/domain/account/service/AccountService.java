@@ -187,41 +187,15 @@ public class AccountService {
         String prodType = String.valueOf(productEntity.getProdType());
 
         // 계좌 생성 및 계좌번호 중복 체크
-        Account savedAccount;
-        String accCode;
-        do {
-            accCode = accCodeGenerator.generateAccCode();
-        } while (accountRepository.existsByAccCode(accCode));
-
-        Account.AccountBuilder accountBuilder = Account.builder()
-                .accCode(accCode)
-                .product(productEntity)
-                .user(userEntity)
-                .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
-                .accPwd(passwordEncoder.encode(request.getAccountPwd()))
-                .status(ACTIVE);
-
-        if (prodType.equals("DEPOSIT"))
-            accountBuilder.accBalance(0L);
-
-        if (request.getAmount() != null)
-            accountBuilder.accBalance(request.getAmount());
-
-        if (request.getAccTrsfLimit() != null)
-            accountBuilder.accTrsfLimit(request.getAccTrsfLimit());
-
-        savedAccount = accountBuilder.build();
-
+        Account savedAccount = createAccount(request, userEntity, productEntity, now, prodType);
         accountRepository.save(savedAccount);
 
-        //이체
-
         // 자동 이체 설정 (적금 또는 대출일 때만)
-        setAutoTransfer(request, productEntity, savedAccount);
+        setAutoTransfer(request, userId, productEntity, savedAccount);
 
         if (prodType.equals("DEPOSIT")){
             // 예금 상품일경우 주거래은행에서 돈 출금
-            setDepositTransfer(accCode, userEntity, request, userId);
+            setDepositTransfer(savedAccount.getAccCode(), userEntity, request, userId);
         }
         AccountResponseDto.JoinAcc code = new AccountResponseDto.JoinAcc(savedAccount.getAccCode());
         return ApiResponse.success(ACCOUNT_CREATE_SUCCESS, code);
@@ -234,7 +208,7 @@ public class AccountService {
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
 
         // 비밀번호 확인
-        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
+        if (!checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
             throw new CustomException(ACCOUNT_PWD_FAIL);
         };
 
@@ -256,7 +230,7 @@ public class AccountService {
         }
 
         // 비밀번호 확인
-        if (checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
+        if (!checkAccountByAccPwd(request.getAccCode(), request.getAccPwd())) {
             throw new CustomException(ACCOUNT_PWD_FAIL);
         };
 
@@ -268,12 +242,46 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_LIMIT_MODIFY_SUCCESS);
     }
 
+    private Account createAccount(AccountRequestDto.ProdJoinReq request, User userEntity, Product productEntity, LocalDate now, String prodType) {
+        String accCode;
+        do {
+            accCode = accCodeGenerator.generateAccCode();
+        } while (accountRepository.existsByAccCode(accCode));
+
+        Account.AccountBuilder accountBuilder = Account.builder()
+                .accCode(accCode)
+                .product(productEntity)
+                .user(userEntity)
+                .accTime(now.plusMonths(request.getPeriod())) // plusMonths() 으로 만기일 지정
+                .accPwd(passwordEncoder.encode(request.getAccountPwd()))
+                .status(ACTIVE);
+
+        if (request.getAmount() != null)
+            accountBuilder.accBalance(request.getAmount());
+
+        if (prodType.equals("DEPOSIT"))
+            accountBuilder.accBalance(0L);
+
+        if (request.getAccTrsfLimit() != null)
+            accountBuilder.accTrsfLimit(request.getAccTrsfLimit());
+
+        return accountBuilder.build();
+    }
+
     // 자동 이체 설정
-    private void setAutoTransfer(AccountRequestDto.ProdJoinReq request, Product product, Account savedAccount) {
-        // 적금 또는 대출일 때만 실행
-        if(product.getProdType().equals(ProdType.SAVINGS) || product.getProdType().equals(ProdType.LOAN)) {
+    private void setAutoTransfer(AccountRequestDto.ProdJoinReq request, String userId, Product product, Account savedAccount) {
+        // 적금일 때만 실행
+        if(product.getProdType().equals(ProdType.SAVINGS)) {
             // 출금 계좌 조회
             Account outAccount = getAccByAccCode(request.getOutAccount());
+
+            //해지된 계좌 예외처리
+            checkAccStatus(outAccount);
+
+            // 출금 계좌가 사용자 계좌인지 확인
+            if (!outAccount.getUser().getUserId().equals(userId)) {
+                throw new CustomException(ACCOUNT_NOT_YOURS);
+            }
 
             // 자동이체 Entity 생성
             AutoTransferId autoTransferId = AutoTransferId.builder()
@@ -328,7 +336,7 @@ public class AccountService {
     }
 
     @Transactional
-    protected void setRateTransfer(String accCode, Long netInterest){
+    public void setRateTransfer(String accCode, Long netInterest){
         AccountRequestDto.Transfer transferAccount = AccountRequestDto.Transfer.builder()
                 .inAccCode(accCode)
                 .inBankCode(C04)
@@ -340,7 +348,7 @@ public class AccountService {
     }
 
     // 최소 납입, 최내 납입 금액확인.
-    public void validateProductAmount(Long prodCode, Long amount) {
+    private void validateProductAmount(Long prodCode, Long amount) {
         Product product = productRepository.findById(prodCode)
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
 
@@ -348,8 +356,9 @@ public class AccountService {
             throw new CustomException(AMOUNT_OUT_OF_RANGE);
         }
     }
+
     // 납입시 상품의 최대 납입 금액을 넘어 가지 않게 확인.
-    public void validatePostTransferAmount(Account account, Long amount) {
+    private void validatePostTransferAmount(Account account, Long amount) {
         Product product = account.getProduct();
         long newBalance = account.getAccBalance() + amount;
 
@@ -358,8 +367,6 @@ public class AccountService {
         }
     }
 
-
-   // 중복 함수 분리
     private Boolean checkAccountByAccPwd(String accCode, String accPwd) {
         String accPwdCheck = accountRepository.findAccPwdByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));

@@ -12,16 +12,18 @@ public class ProductResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class GetProduct {
+        private Long prodCode;
         private String prodName;
         private String prodPromo;
-        private String joinMember;
+        private int joinPeriod;
         private double prodRate;
         // from 메소드 정의
         public static ProductResponseDto.GetProduct from(Product prodEntity) {
             return new ProductResponseDto.GetProduct(
+                    prodEntity.getProdCode(),
                     prodEntity.getProdName(),
                     prodEntity.getProdPromo(),
-                    prodEntity.getJoinMember(),
+                    prodEntity.getJoinPeriod(),
                     prodEntity.getProdRate()
             );
         }
@@ -73,30 +75,4 @@ public class ProductResponseDto {
             );
         }
     }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
-    public static class GetProdSearch {
-        private Long prodCode;
-        private String prodName;
-        private String prodDesc;
-        private int joinPeriod;
-        private double prodRate;
-        private Long prodLimit;
-
-        // from 메소드 정의
-        public static ProductResponseDto.GetProdSearch from(Product prodEntity) {
-            return new ProductResponseDto.GetProdSearch(
-                    prodEntity.getProdCode(),
-                    prodEntity.getProdName(),
-                    prodEntity.getProdDesc(),
-                    prodEntity.getJoinPeriod(),
-                    prodEntity.getProdRate(),
-                    prodEntity.getProdLimit()
-                    );
-        }
-
-    }
-
 }
