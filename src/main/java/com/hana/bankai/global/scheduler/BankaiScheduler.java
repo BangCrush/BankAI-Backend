@@ -24,6 +24,6 @@ public class BankaiScheduler {
     @Scheduled(cron = "0 0 12 * * ?") // 매일 낮 12시에 실행
     public void autoTransfer() { autoTransferService.autoTransfer(); }
 
-    @Scheduled(cron = "0 0 0 15 * ?") // 매달 15일에 실행
+    @Scheduled(cron = "0 0 12 15 * ?") // 매달 15일 낮 12시에 실행
     public void rateTransfer() { accountService.rateTransfer(); }
 }

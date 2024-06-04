@@ -95,6 +95,9 @@ public class AccountService {
         Account outAcc = getAccByAccCode(request.getOutAccCode());
         Account inAcc = getAccByAccCode(request.getInAccCode());
 
+        // 최소 최대 납입 확인
+        validateProductAmount(inAcc.getProduct().getProdCode(), request.getAmount());
+
         // 사용자 인증 예외처리
         authenticateUser(user, outAcc.getUser());
 
@@ -110,6 +113,9 @@ public class AccountService {
         if (outAcc.getAccTrsfLimit() < request.getAmount() || trsfLimitService.checkTrsfLimit(user.getUserCode(), request.getAmount())) {
             throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
         }
+        // 최대납입 금액 처리.
+        validatePostTransferAmount(inAcc, request.getAmount());
+
 
         // 트랜잭션 시작
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
@@ -210,10 +216,9 @@ public class AccountService {
 
         //이체
 
-        if (prodType.equals("SAVINGS") || prodType.equals("LOAN")  ){
-            // 자동 이체 설정 (적금 또는 대출일 때만)
-            setAutoTransfer(request, productEntity, savedAccount);
-        }
+        // 자동 이체 설정 (적금 또는 대출일 때만)
+        setAutoTransfer(request, productEntity, savedAccount);
+
         if (prodType.equals("DEPOSIT")){
             // 예금 상품일경우 주거래은행에서 돈 출금
             setDepositTransfer(accCode, userEntity, request, userId);
@@ -332,6 +337,25 @@ public class AccountService {
                 .amount(netInterest)
                 .build();
         transfer(transferAccount, "admin", PAY_INTEREST);
+    }
+
+    // 최소 납입, 최내 납입 금액확인.
+    public void validateProductAmount(Long prodCode, Long amount) {
+        Product product = productRepository.findById(prodCode)
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_SEARCH));
+
+        if (amount < product.getProdMin() || amount > product.getProdMax()) {
+            throw new CustomException(AMOUNT_OUT_OF_RANGE);
+        }
+    }
+    // 납입시 상품의 최대 납입 금액을 넘어 가지 않게 확인.
+    public void validatePostTransferAmount(Account account, Long amount) {
+        Product product = account.getProduct();
+        long newBalance = account.getAccBalance() + amount;
+
+        if (newBalance > product.getProdMax()) {
+            throw new CustomException(MAX_AMOUNT_EXCEEDED);
+        }
     }
 
 
