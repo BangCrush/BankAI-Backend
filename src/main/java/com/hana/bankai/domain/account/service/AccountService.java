@@ -217,7 +217,7 @@ public class AccountService {
         //이체
 
         // 자동 이체 설정 (적금 또는 대출일 때만)
-        setAutoTransfer(request, productEntity, savedAccount);
+        setAutoTransfer(request, userId, productEntity, savedAccount);
 
         if (prodType.equals("DEPOSIT")){
             // 예금 상품일경우 주거래은행에서 돈 출금
@@ -269,11 +269,19 @@ public class AccountService {
     }
 
     // 자동 이체 설정
-    private void setAutoTransfer(AccountRequestDto.ProdJoinReq request, Product product, Account savedAccount) {
-        // 적금 또는 대출일 때만 실행
+    private void setAutoTransfer(AccountRequestDto.ProdJoinReq request, String userId, Product product, Account savedAccount) {
+        // 적금일 때만 실행
         if(product.getProdType().equals(ProdType.SAVINGS)) {
             // 출금 계좌 조회
             Account outAccount = getAccByAccCode(request.getOutAccount());
+
+            //해지된 계좌 예외처리
+            checkAccStatus(outAccount);
+
+            // 출금 계좌가 사용자 계좌인지 확인
+            if (!outAccount.getUser().getUserId().equals(userId)) {
+                throw new CustomException(ACCOUNT_NOT_YOURS);
+            }
 
             // 자동이체 Entity 생성
             AutoTransferId autoTransferId = AutoTransferId.builder()
