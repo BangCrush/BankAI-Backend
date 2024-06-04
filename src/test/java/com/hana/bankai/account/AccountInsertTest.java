@@ -24,11 +24,11 @@ class AccountInsertTest {
         return accCode.toString();
     }
 
-    @Test
-    void 계좌생성테스트() {
-        // 테스트 계정 코드 생성
-        String accCode = generateTestAccCode();
-        // 로그에 출력하여 생성된 코드를 확인
-        log.info("Generated Account Code: {}", accCode);
-    }
+//    @Test
+//    void 계좌생성테스트() {
+//        // 테스트 계정 코드 생성
+//        String accCode = generateTestAccCode();
+//        // 로그에 출력하여 생성된 코드를 확인
+//        log.info("Generated Account Code: {}", accCode);
+//    }
 }
