@@ -22,14 +22,13 @@ public class ProductController {
 
     @Operation(summary = "전체 상품 조회")
     @GetMapping("/")
-    public ApiResponse<Map<ProdType,List<Product>>> allProd() {
+    public ApiResponse<Map<ProdType,List<ProductResponseDto.GetProduct>>> allProd() {
         return productService.productSearchAll();
     }
 
     @Operation(summary = "상품 타입 별 조회")
     @GetMapping("/{prodtype}")
-    public ApiResponse<List<ProductResponseDto.GetProduct>> searchDepositProd(@PathVariable("prodtype") int prodType) {
-
+    public ApiResponse<Map<ProdType,List<ProductResponseDto.GetProduct>>> searchDepositProd(@PathVariable("prodtype") int prodType) {
         return productService.getProduct(prodType);
     }
     @Operation(summary = "상품 별 상세 조회")
