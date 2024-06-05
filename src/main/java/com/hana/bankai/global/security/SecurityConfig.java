@@ -34,11 +34,11 @@ public class SecurityConfig {
 
     // 로그인 하지 않아도 접근 가능한 주소 설정
     private static final String[] AUTH_WHITELIST = {
-            "/swagger-ui/**",        // Swagger UI에 대한 경로
+            "/swagger-ui/**", // Swagger UI에 대한 경로
             "/bankAi-docs/**",
             "/register/**",
             "/login/**",
-            "/admin/**",
+            "/admin/**", // 관리자 로그인 구현 이후 삭제 예정
     };
 
     @Bean
@@ -67,8 +67,9 @@ public class SecurityConfig {
         // 권한 규칙 작성
         http.authorizeHttpRequests(authorize -> authorize
 //                        .anyRequest().permitAll()
-                .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST에 있는 경로는 인증 없이 접근 허용
-                .anyRequest().hasAnyRole("USER", "ADMIN") // 나머지 모든 요청은 ROLE_USER 또는 ROLE_ADMIN 역할 필요
+//                        .requestMatchers("/admin/**").hasAnyRole("ADMIN") // 해당 URI에 있는 경로는 관리자만 접근 가능
+                        .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST에 있는 경로는 인증 없이 접근 허용
+                        .anyRequest().hasAnyRole("USER", "ADMIN") // 나머지 모든 요청은 ROLE_USER 또는 ROLE_ADMIN 역할 필요
         );
 
         return http.build();

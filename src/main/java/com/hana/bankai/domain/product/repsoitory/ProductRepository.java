@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-
     List<Product> findByProdType(ProdType prodtype);
 
     // 상품 가입 top-three 쿼리
@@ -26,7 +25,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findTopProducts();
 
     Optional<List<Product>> findByProdNameContaining(String keyword);
-
-
-
 }
