@@ -1,7 +1,10 @@
 package com.hana.bankai.domain.admin.controller;
 
 import com.hana.bankai.domain.admin.dto.AdminResponseDto;
+import com.hana.bankai.domain.admin.dto.AdminResponseDto;
 import com.hana.bankai.domain.admin.service.AdminService;
+import com.hana.bankai.global.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import com.hana.bankai.domain.product.entity.ProdType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
 import java.util.Map;
 
 @RestController
@@ -30,5 +34,11 @@ public class AdminController {
     public Map<ProdType, List<AdminResponseDto.ProductJoinCntByAgeGroup>> getBarChartData() {
         return adminService.getBarChartData();
     }
+
+    @GetMapping("/piechart")
+    public ApiResponse<List<Integer>> getProdJoinRate() {
+        return adminService.getProdJoinRate();
+    }
+
 
 }

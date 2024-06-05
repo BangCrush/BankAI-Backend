@@ -1,14 +1,22 @@
 package com.hana.bankai.domain.admin.service;
 
 import com.hana.bankai.domain.account.repository.AccountRepository;
+import com.hana.bankai.domain.admin.dto.AdminRequestDto;
+import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.admin.dto.AdminResponseDto;
 import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.product.entity.Product;
 import com.hana.bankai.domain.product.repsoitory.ProductRepository;
+import com.hana.bankai.global.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.hana.bankai.global.common.response.SuccessCode.PRODUCT_SEARCH_SUCCESS;
 
 import java.util.HashMap;
 import java.util.List;
@@ -67,5 +75,14 @@ public class AdminService {
                 ));
     }
 
-
+    // 상품별 가입자수 비율
+    public ApiResponse<List<Integer>> getProdJoinRate() {
+        List<Integer> productDtoList =  new ArrayList<>();
+        for(int i=1; i <= 4; i++){
+            ProdType prodTypeNum = ProdType.of(i);
+            int list = accountRepository.countByProdType(prodTypeNum);
+            productDtoList.add(list);
+        }
+        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, productDtoList);
+    };
 }
