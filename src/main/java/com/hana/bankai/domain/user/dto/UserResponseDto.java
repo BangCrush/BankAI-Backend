@@ -58,6 +58,7 @@ public class UserResponseDto {
         private String companyAddr;
         private String companyPhone;
         private String userMainAcc;
+        private Long userTrsfLimit;
 
         public static UserInfo from(User user) {
             return UserInfo.builder()
@@ -72,6 +73,7 @@ public class UserResponseDto {
                     .companyAddr(user.getUserJob() != null ? user.getUserJob().getCompanyAddr() : null)
                     .companyPhone(user.getUserJob() != null ? user.getUserJob().getCompanyPhone() : null)
                     .userMainAcc(user.getUserMainAcc() != null ? user.getUserMainAcc() : null)
+                    .userTrsfLimit(user.getUserTrsfLimit().getDailyLimit())
                     .build();
         }
     }
