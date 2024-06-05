@@ -96,7 +96,7 @@ public class AccountService {
 
         // 타입이 적금 또는 예금이면서 만료일 이전일 경우 예외 발생
         if (isRestrictedAccount(outAcc)) {
-            throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
+            throw new CustomException(ACCOUNT_NOT_MATURED);
         }
 
         // 최소 최대 납입 확인

@@ -35,6 +35,8 @@ public enum ErrorCode {
     ACCOUNT_PWD_FAIL("E207","계좌 비밀번호가 다릅니다"),
     ACCOUNT_NOT_YOURS("E208", "출금 계좌가 본인 계좌가 아닙니다."),
     ACCOUNT_STATE_DELETED("E209","해지된 계좌입니다."),
+    ACCOUNT_NOT_MATURED("E210", "만기일 이전에는 이체를 할 수 없습니다."),
+
 
     // Redis
     LOCK_NOT_AVAILABLE("E400", "사용할 수 없는 락"),
