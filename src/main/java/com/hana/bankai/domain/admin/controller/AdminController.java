@@ -1,10 +1,8 @@
 package com.hana.bankai.domain.admin.controller;
 
 import com.hana.bankai.domain.admin.dto.AdminResponseDto;
-import com.hana.bankai.domain.admin.dto.AdminResponseDto;
 import com.hana.bankai.domain.admin.service.AdminService;
 import com.hana.bankai.global.common.response.ApiResponse;
-import io.swagger.v3.oas.annotations.Operation;
 import com.hana.bankai.domain.product.entity.ProdType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,8 @@
 package com.hana.bankai.domain.admin.service;
 
 import com.hana.bankai.domain.account.repository.AccountRepository;
-import com.hana.bankai.domain.admin.dto.AdminRequestDto;
 import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.admin.dto.AdminResponseDto;
-import com.hana.bankai.domain.product.entity.ProdType;
 import com.hana.bankai.domain.product.entity.Product;
 import com.hana.bankai.domain.product.repsoitory.ProductRepository;
 import com.hana.bankai.global.common.response.ApiResponse;
@@ -19,7 +17,6 @@ import java.util.List;
 import static com.hana.bankai.global.common.response.SuccessCode.PRODUCT_SEARCH_SUCCESS;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
