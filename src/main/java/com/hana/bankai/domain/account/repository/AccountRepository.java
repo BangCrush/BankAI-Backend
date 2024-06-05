@@ -33,4 +33,8 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             "GROUP BY MONTH(a.accJoinDate) " +
             "ORDER BY MONTH(a.accJoinDate)")
     List<Object[]> findMonthlyAccountCounts(@Param("year") int year, @Param("prodType")ProdType prodType);
+
+    @Query("select count(a) from account a where a.product.prodType = :prodtype")
+    int countByProdType(@Param("prodtype") ProdType prodtype);
+
 }
