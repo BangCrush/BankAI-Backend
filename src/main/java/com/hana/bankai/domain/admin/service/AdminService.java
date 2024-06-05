@@ -76,27 +76,13 @@ public class AdminService {
     }
 
     // 상품별 가입자수 비율
-    public ApiResponse<List<Double>> getProdJoinRate() {
+    public ApiResponse<List<Integer>> getProdJoinRate() {
         List<Integer> productDtoList =  new ArrayList<>();
         for(int i=1; i <= 4; i++){
             ProdType prodTypeNum = ProdType.of(i);
-            int typeCount = accountRepository.countByProdType(prodTypeNum);
-            productDtoList.add(typeCount);
+            int list = accountRepository.countByProdType(prodTypeNum);
+            productDtoList.add(list);
         }
-        // 모든 타입의 총 가입자 수 계산
-        int sum = productDtoList.stream().mapToInt(Integer::intValue).sum();
-
-        // 각 타입의 비율을 계산하고 새로운 리스트에 저장
-        List<Double> proportions = new ArrayList<>();
-        for(int count : productDtoList) {
-            double proportion = (double) count / sum;
-            proportions.add(proportion);
-        }
-        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, proportions);
+        return ApiResponse.success(PRODUCT_SEARCH_SUCCESS, productDtoList);
     };
-
-
-
-
-
 }

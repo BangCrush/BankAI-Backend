@@ -35,9 +35,8 @@ public class AdminController {
         return adminService.getBarChartData();
     }
 
-    @Operation(summary = "상품 종류별 가입자 수 비율 ")
     @GetMapping("/piechart")
-    public ApiResponse<List<Double>> getProdJoinRate() {
+    public ApiResponse<List<Integer>> getProdJoinRate() {
         return adminService.getProdJoinRate();
     }
 
