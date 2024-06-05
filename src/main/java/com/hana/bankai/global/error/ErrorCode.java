@@ -34,6 +34,7 @@ public enum ErrorCode {
     LIMIT_MODIFY_FAIL("E206","이체 한도 수정 실패: 이체 한도가 일일 한도보다 큽니다"),
     ACCOUNT_PWD_FAIL("E207","계좌 비밀번호가 다릅니다"),
     ACCOUNT_NOT_YOURS("E208", "출금 계좌가 본인 계좌가 아닙니다."),
+    ACCOUNT_STATE_DELETED("E209","해지된 계좌입니다."),
 
     // Redis
     LOCK_NOT_AVAILABLE("E400", "사용할 수 없는 락"),

@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.hana.bankai.domain.account.entity.AccStatus.DELETED;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,6 +35,9 @@ public class AutoTransferService {
 
             // 출금 계좌 user ID 조회
             Account outAccount = autoTransfer.getAccount();
+            // 계좌 해지 상태 조회
+            if (outAccount.getStatus() == DELETED) continue;
+
             String userId = outAccount.getUser().getUserId();
 
             // 이체(Transfer) DTO 생성
