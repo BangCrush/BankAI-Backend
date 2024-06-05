@@ -38,7 +38,6 @@ public class SecurityConfig {
             "/bankAi-docs/**",
             "/register/**",
             "/login/**",
-            "/admin/**", // 관리자 로그인 구현 이후 삭제 예정
     };
 
     @Bean
@@ -67,7 +66,7 @@ public class SecurityConfig {
         // 권한 규칙 작성
         http.authorizeHttpRequests(authorize -> authorize
 //                        .anyRequest().permitAll()
-//                        .requestMatchers("/admin/**").hasAnyRole("ADMIN") // 해당 URI에 있는 경로는 관리자만 접근 가능
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN") // 해당 URI에 있는 경로는 관리자만 접근 가능
                         .requestMatchers(AUTH_WHITELIST).permitAll() // AUTH_WHITELIST에 있는 경로는 인증 없이 접근 허용
                         .anyRequest().hasAnyRole("USER", "ADMIN") // 나머지 모든 요청은 ROLE_USER 또는 ROLE_ADMIN 역할 필요
         );
