@@ -68,7 +68,6 @@ public class AccountService {
 
     public ApiResponse<AccountResponseDto.SearchAcc> searchAcc(String accCode) {
         Account account = getAccByAccCode(accCode);
-
         // 해지된 계좌인지 확인
         checkAccStatus(account);
         String userName = account.getUser().getUserNameKr();
@@ -95,6 +94,11 @@ public class AccountService {
         Account outAcc = getAccByAccCode(request.getOutAccCode());
         Account inAcc = getAccByAccCode(request.getInAccCode());
 
+        // 타입이 적금 또는 예금이면서 만료일 이전일 경우 예외 발생
+        if (isRestrictedAccount(outAcc)) {
+            throw new CustomException(ACCOUNT_NOT_MATURED);
+        }
+
         // 최소 최대 납입 확인
         validateProductAmount(inAcc.getProduct().getProdCode(), request.getAmount());
 
@@ -115,7 +119,6 @@ public class AccountService {
         }
         // 최대납입 금액 처리.
         validatePostTransferAmount(inAcc, request.getAmount());
-
 
         // 트랜잭션 시작
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
@@ -143,6 +146,8 @@ public class AccountService {
 
         User user = getUserByUserId(userId);
         for (Account acc : user.getAccountList()) {
+            //해지된 계좌는 조회 안함.
+            if (acc.getStatus() == DELETED) continue;
             accInfoList.add(AccountResponseDto.GetAccInfo.from(acc));
         }
 
@@ -387,7 +392,7 @@ public class AccountService {
 
     private void checkAccStatus(Account acc) {
         if (acc.getStatus() == DELETED) {
-            throw new CustomException(ACCOUNT_NOT_FOUND);
+            throw new CustomException(ACCOUNT_STATE_DELETED);
         }
     }
 
@@ -399,6 +404,16 @@ public class AccountService {
     private Long retrieveBalance(String accCode) {
         return accountRepository.findAccBalanceByAccCode(accCode)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+    }
+
+    // 만기일 체크
+    private boolean isExpiredAccount(Account account) {
+        return account.getAccTime().isBefore(LocalDate.now());
+    }
+    // 예금 & 적금 확인 및 만기일 확인
+    private boolean isRestrictedAccount(Account account) {
+        ProdType prodType = account.getProduct().getProdType();
+        return (prodType == ProdType.SAVINGS || prodType == ProdType.DEPOSIT) && !isExpiredAccount(account);
     }
 
 }
