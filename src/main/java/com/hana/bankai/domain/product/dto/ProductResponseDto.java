@@ -61,7 +61,7 @@ public class ProductResponseDto {
         private int joinPeriod;
         private double prodRate;
         private Long prodLimit;
-        private String prodDesc;
+        private String prodPromo;
 
         // from 메소드 정의
         public static ProductResponseDto.GetTopThree from(Product prodEntity) {
@@ -71,7 +71,7 @@ public class ProductResponseDto {
                     prodEntity.getJoinPeriod(),
                     prodEntity.getProdRate(),
                     prodEntity.getProdLimit(),
-                    prodEntity.getProdDesc()
+                    prodEntity.getProdPromo()
             );
         }
     }
