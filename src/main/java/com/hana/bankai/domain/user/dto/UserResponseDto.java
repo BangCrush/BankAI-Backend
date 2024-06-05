@@ -57,6 +57,7 @@ public class UserResponseDto {
         private String companyName;
         private String companyAddr;
         private String companyPhone;
+        private String userMainAcc;
 
         public static UserInfo from(User user) {
             return UserInfo.builder()
@@ -70,6 +71,7 @@ public class UserResponseDto {
                     .companyName(user.getUserJob() != null ? user.getUserJob().getCompanyName() : null)
                     .companyAddr(user.getUserJob() != null ? user.getUserJob().getCompanyAddr() : null)
                     .companyPhone(user.getUserJob() != null ? user.getUserJob().getCompanyPhone() : null)
+                    .userMainAcc(user.getUserMainAcc() != null ? user.getUserMainAcc() : null)
                     .build();
         }
     }
