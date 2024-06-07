@@ -49,7 +49,7 @@ public class User implements UserDetails {
     @NotNull
     private String userNameEn;
 
-    @Column(updatable = false, unique = true)
+    @Column(updatable = false)
     @NotNull
     private String userInherentNumber;
 
