@@ -26,15 +26,25 @@ public class AccTransferTest {
 //    @Test
 //    void 계좌이체_동시성_테스트() throws InterruptedException {
 //        // given
-//        ApiResponse<AccountResponseDto.GetBalance> outAcc = accountService.getBalance("04-23952-3659537", "soyeon");
-//        Long outAccBalance = outAcc.getData().getAccBalance();
+//        ApiResponse<AccountResponseDto.GetBalance> outAcc1 = accountService.getBalance("04-23952-3659537", "soyeon");
+//        Long outAcc1Balance = outAcc1.getData().getAccBalance();
+//        ApiResponse<AccountResponseDto.GetBalance> outAcc2 = accountService.getBalance("04-00706-3829355", "sojisub");
+//        Long outAcc2Balance = outAcc2.getData().getAccBalance();
 //        ApiResponse<AccountResponseDto.GetBalance> inAcc = accountService.getBalance("04-77825-0567386", "samsiclover");
 //        Long inAccBalance = inAcc.getData().getAccBalance();
 //
-//        Transfer transfer = Transfer.builder()
+//        Transfer transfer1 = Transfer.builder()
 //                .inAccCode("04-77825-0567386")
 //                .inBankCode(BankCode.C04)
 //                .outAccCode("04-23952-3659537")
+//                .outBankCode(BankCode.C04)
+//                .amount(100L)
+//                .build();
+//
+//        Transfer transfer2 = Transfer.builder()
+//                .inAccCode("04-77825-0567386")
+//                .inBankCode(BankCode.C04)
+//                .outAccCode("04-00706-3829355")
 //                .outBankCode(BankCode.C04)
 //                .amount(100L)
 //                .build();
@@ -47,7 +57,8 @@ public class AccTransferTest {
 //        for (int i = 0; i < numberOfThreads; i++) {
 //            executorService.submit(() -> {
 //                try {
-//                    accountService.transfer(transfer, "soyeon", HisType.TRANSFER);
+//                    accountService.transfer(transfer1, "soyeon", HisType.TRANSFER);
+//                    accountService.transfer(transfer2, "sojisub", HisType.TRANSFER);
 //                } finally {
 //                    latch.countDown();
 //                }
@@ -56,18 +67,23 @@ public class AccTransferTest {
 //        latch.await();
 //
 //        // then
-//        ApiResponse<AccountResponseDto.GetBalance> updatedOutAcc = accountService.getBalance("04-23952-3659537", "soyeon");
-//        Long updatedOutAccBalance = updatedOutAcc.getData().getAccBalance();
+//        ApiResponse<AccountResponseDto.GetBalance> updatedOutAcc1 = accountService.getBalance("04-23952-3659537", "soyeon");
+//        Long updatedOutAcc1Balance = updatedOutAcc1.getData().getAccBalance();
+//        ApiResponse<AccountResponseDto.GetBalance> updatedOutAcc2 = accountService.getBalance("04-00706-3829355", "sojisub");
+//        Long updatedOutAcc2Balance = updatedOutAcc2.getData().getAccBalance();
 //        ApiResponse<AccountResponseDto.GetBalance> updatedInAcc = accountService.getBalance("04-77825-0567386", "samsiclover");
 //        Long updatedInAccBalance = updatedInAcc.getData().getAccBalance();
 //
-//        assertThat(updatedOutAccBalance).isEqualTo(outAccBalance - 100L * numberOfThreads);
-//        assertThat(updatedInAccBalance).isEqualTo(inAccBalance + 100L * numberOfThreads);
+//        assertThat(updatedOutAcc1Balance).isEqualTo(outAcc1Balance - 100L * numberOfThreads);
+//        assertThat(updatedOutAcc2Balance).isEqualTo(outAcc2Balance - 100L * numberOfThreads);
+//        assertThat(updatedInAccBalance).isEqualTo(inAccBalance + 200L * numberOfThreads);
 //
-//        log.info("이체 전 출금 계좌 잔액 = {}", outAccBalance);
+//        log.info("이체 전 출금 계좌 1 잔액 = {}", outAcc1Balance);
+//        log.info("이체 전 출금 계좌 2 잔액 = {}", outAcc2Balance);
 //        log.info("이체 전 입금 계좌 잔액 = {}", inAccBalance);
 //        log.info("-----계좌 이체 진행-----");
-//        log.info("이체 후 출금 계좌 잔액 = {}", updatedOutAccBalance);
+//        log.info("이체 후 출금 계좌 1 잔액 = {}", updatedOutAcc1Balance);
+//        log.info("이체 후 출금 계좌 2 잔액 = {}", updatedOutAcc2Balance);
 //        log.info("이체 후 입금 계좌 잔액 = {}", updatedInAccBalance);
 //    }
 }
