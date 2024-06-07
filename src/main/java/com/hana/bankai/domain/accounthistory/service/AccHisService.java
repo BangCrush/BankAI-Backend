@@ -71,11 +71,13 @@ public class AccHisService {
         String targetAccCode = isDeposit ? accHisReq.getOutAccCode() : accHisReq.getInAccCode();
         Account targetAcc = getAccByAccCode(targetAccCode);
         User targetUser = getUserByUserId(targetAcc.getUser().getUserId());
+        // 이자 지급인지 확인
+        String target = targetUser.getUserNameKr().equals("관리자") ? "입출금통장 이자" : targetUser.getUserNameKr();
 
         Long hisAmount = isDeposit ? accHisReq.getHisAmount() : -accHisReq.getHisAmount();
         Long balance = isDeposit ? accHisReq.getAfterInBal() : accHisReq.getAfterOutBal();
 
-        return AccountResponseDto.GetAccHis.of(accHisReq, targetUser.getUserNameKr(), hisAmount, balance);
+        return AccountResponseDto.GetAccHis.of(accHisReq, target, hisAmount, balance);
     }
 
     private Account getAccByAccCode(String accCode) {
