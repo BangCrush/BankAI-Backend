@@ -86,7 +86,7 @@ public class AccountService {
         return ApiResponse.success(ACCOUNT_PWD_CHECK_SUCCESS, new AccountResponseDto.CheckRes(isPwdValid));
     }
 
-    @DistributedLock(key = "#request.getOutAccCode()")
+    @DistributedLock(key = {"#request.getOutAccCode()", "#request.getInAccCode()"})
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse transfer(AccountRequestDto.Transfer request, String userId, HisType hisType) {
         User user = getUserByUserId(userId);
