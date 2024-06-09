@@ -31,7 +31,7 @@ public class SmsUtil {
         Message message = new Message();
         message.setFrom(sender);
         message.setTo(to);
-        message.setText("[BankAi] 아래의 인증번호를 입력해 주세요.\n" + verificationCode);
+        message.setText("[BankAi] 본인확인 인증번호는 [" + verificationCode + "]입니다.");
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         return response;
