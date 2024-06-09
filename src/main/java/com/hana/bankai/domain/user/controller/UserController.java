@@ -140,4 +140,10 @@ public class UserController {
     public ApiResponse verifySms(@RequestBody UserRequestDto.SmsVerify request) {
         return userService.verifySms(request);
     }
+
+    @Operation(summary = "오늘 사용한 금액 확인")
+    @GetMapping("/users/check-daily-amount")
+    public ApiResponse<Long> getDailyAccAmount(@AuthenticationPrincipal UserDetails user) {
+        return userService.getDailyAccAmount(user.getUsername());
+    }
 }
