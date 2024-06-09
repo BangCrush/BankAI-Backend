@@ -131,8 +131,7 @@ public class UserService implements UserDetailsService {
     // 로그인
     public ApiResponse<UserResponseDto.TokenInfo> login(UserRequestDto.Login login, Role role) {
         // 로그인 정보 계정 조회
-        User user = userRepository.findByUserId(login.getUserId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        User user = getUserByUserId(login.getUserId());
 
         log.info("role == Role.ROLE_ADMIN: {}", role == Role.ROLE_ADMIN);
         log.info("user.getRoles().contains(Role.ROLE_ADMIN.name()): {}", user.getRoles().contains(Role.ROLE_ADMIN.name()));
@@ -238,16 +237,14 @@ public class UserService implements UserDetailsService {
 
     // 회원 정보 조회
     public ApiResponse<UserResponseDto.UserInfo> getUserInfo(String userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(USER_GET_INFO_FAIL));
+        User user = getUserByUserId(userId);
 
         return ApiResponse.success(USER_GET_INFO_SUCCESS, UserResponseDto.UserInfo.from(user));
     }
 
     // 회원 정보 수정
     public ApiResponse<Object> updateUserInfo(String userId, UserRequestDto.UserInfo request) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(USER_UPDATE_INFO_FAIL));
+        User user = getUserByUserId(userId);
 
         userRepository.updateUser(
                 user.getUserCode(),
@@ -269,16 +266,14 @@ public class UserService implements UserDetailsService {
 
     // 직업 정보 조회
     public ApiResponse<UserResponseDto.UserJobInfo> getUserJobInfo(String userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(USER_GET_JOB_INFO_FAIL));
+        User user = getUserByUserId(userId);
 
         return ApiResponse.success(USER_GET_JOB_INFO_SUCCESS, UserResponseDto.UserJobInfo.from(user.getUserJob()));
     }
 
     // 직업 정보 수정
     public ApiResponse<Object> updateUserJobInfo(String userId, UserRequestDto.UserJobInfo request) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(USER_UPDATE_JOB_INFO_FAIL));
+        User user = getUserByUserId(userId);
 
         userJobRepository.updateUserJob(
                 user.getUserCode(),
@@ -308,6 +303,19 @@ public class UserService implements UserDetailsService {
         }
         smsCertification.deleteSmsCertification(request.getUserPhone());
         return ApiResponse.success(SEND_VERIFY_SUCCESS);
+    }
+
+    public ApiResponse<Long> getDailyAccAmount(String userId) {
+        User user = getUserByUserId(userId);
+        UserTrsfLimit userTrsfLimit = trsfLimitRepository.findById(user.getUserCode())
+                .orElseThrow(() -> new CustomException(USER_TRSF_LIMIT_NOT_FOUND));
+
+        return ApiResponse.success(USER_DAILY_AMOUNT_CHECK_SUCCESS, userTrsfLimit.getDailyAccAmount());
+    }
+
+    private User getUserByUserId(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
     private String getVerificationCode() {

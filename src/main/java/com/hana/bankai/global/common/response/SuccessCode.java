@@ -28,6 +28,7 @@ public enum SuccessCode {
     SEND_EMAIL_TEMP_PASSWORD_SUCCESS(OK, "임시 비밀번호 발급 성공"),
     SEND_SMS_SUCCESS(OK, "휴대폰 인증번호 발송 성공"),
     SEND_VERIFY_SUCCESS(OK, "휴대폰 인증번호 검증 성공"),
+    USER_DAILY_AMOUNT_CHECK_SUCCESS(OK, "사용자 일일 이체 요금 조회 성공"),
 
     // Account
     ACCOUNT_CREATE_SUCCESS(CREATED,"계좌 개설 성공"),
