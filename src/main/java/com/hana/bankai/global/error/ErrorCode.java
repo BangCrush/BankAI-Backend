@@ -23,6 +23,7 @@ public enum ErrorCode {
     SEND_EMAIL_TEMP_PASSWORD_FAIL("E113", "임시 비밀번호 발급 실패"),
     SMS_SEND_FAIL("E114", "휴대폰 인증번호 발송 실패"),
     SMS_VERIFY_FAIL("E115", "휴대폰 인증번호 검증 실패"),
+    USER_ADMIN_LOGIN_FAIL("E116", "관리자 권한이 없는 계정입니다."),
 
     // Account
     ACCOUNT_NOT_FOUND("E200", "존재하지 않는 계좌입니다."),

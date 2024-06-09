@@ -129,10 +129,18 @@ public class UserService implements UserDetailsService {
     }
 
     // 로그인
-    public ApiResponse<UserResponseDto.TokenInfo> login(UserRequestDto.Login login) {
+    public ApiResponse<UserResponseDto.TokenInfo> login(UserRequestDto.Login login, Role role) {
         // 로그인 정보 계정 조회
-        if(userRepository.findByUserId(login.getUserId()).orElse(null) == null) {
-            throw new CustomException(USER_NOT_FOUND);
+        User user = userRepository.findByUserId(login.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        log.info("role == Role.ROLE_ADMIN: {}", role == Role.ROLE_ADMIN);
+        log.info("user.getRoles().contains(Role.ROLE_ADMIN.name()): {}", user.getRoles().contains(Role.ROLE_ADMIN.name()));
+
+        // 관리자 계정 로그인 검증
+        // 관리자 페이지에서 로그인 시도 계정이 관리자 계정이 아니면 실행
+        if(role == Role.ROLE_ADMIN && !user.getRoles().contains(Role.ROLE_ADMIN.name())) {
+            throw new CustomException(USER_ADMIN_LOGIN_FAIL);
         }
 
         // 1. 로그인 아이디, 비밀번호를 기반으로 Authentication 객체 생성

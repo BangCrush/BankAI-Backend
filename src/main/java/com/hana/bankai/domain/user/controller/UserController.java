@@ -2,6 +2,7 @@ package com.hana.bankai.domain.user.controller;
 
 import com.hana.bankai.domain.user.dto.UserRequestDto;
 import com.hana.bankai.domain.user.dto.UserResponseDto;
+import com.hana.bankai.domain.user.entity.Role;
 import com.hana.bankai.domain.user.service.MailService;
 import com.hana.bankai.domain.user.service.UserService;
 import com.hana.bankai.global.common.response.ApiResponse;
@@ -62,7 +63,7 @@ public class UserController {
     @Operation(summary = "로그인")
     @PostMapping("/login")
     public ApiResponse<UserResponseDto.TokenInfo> login(@RequestBody UserRequestDto.Login request) {
-        return userService.login(request);
+        return userService.login(request, Role.ROLE_USER);
     }
 
     @Operation(summary = "토큰 재발급")
