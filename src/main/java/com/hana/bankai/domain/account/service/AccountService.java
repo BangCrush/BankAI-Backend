@@ -317,7 +317,7 @@ public class AccountService {
             double principal = rateTransfer.getAccBalance(); // 원금
             double annualRate = rateTransfer.getProduct().getProdRate(); // 연 이율
 
-            double dailyRate = annualRate / 365; // 일 이율
+            double dailyRate = ( annualRate / 100 ) / 365; // 일 이율 (이율이 % 이기 때문에 따로 계산)
             double interest = principal * dailyRate * 30;
             // 이자 소득세 차감
             double taxRate = 0.154; // 15.4%
