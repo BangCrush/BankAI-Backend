@@ -146,4 +146,10 @@ public class UserController {
     public ApiResponse<Long> getDailyAccAmount(@AuthenticationPrincipal UserDetails user) {
         return userService.getDailyAccAmount(user.getUsername());
     }
+
+    @Operation(summary = "오늘 이체 가능한 금액 확인")
+    @GetMapping("/users/check-daily-limit")
+    public ApiResponse<Long> getDailyLimit(@AuthenticationPrincipal UserDetails user) {
+        return userService.getDailyLimit(user.getUsername());
+    }
 }

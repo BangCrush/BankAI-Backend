@@ -313,6 +313,14 @@ public class UserService implements UserDetailsService {
         return ApiResponse.success(USER_DAILY_AMOUNT_CHECK_SUCCESS, userTrsfLimit.getDailyAccAmount());
     }
 
+    public ApiResponse<Long> getDailyLimit(String userId) {
+        User user = getUserByUserId(userId);
+        UserTrsfLimit userTrsfLimit = trsfLimitRepository.findById(user.getUserCode())
+                .orElseThrow(() -> new CustomException(USER_TRSF_LIMIT_NOT_FOUND));
+
+        return ApiResponse.success(USER_DAILY_AMOUNT_CHECK_SUCCESS, userTrsfLimit.getDailyLimit() - userTrsfLimit.getDailyAccAmount());
+    }
+
     private User getUserByUserId(String userId) {
         return userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
