@@ -94,31 +94,8 @@ public class AccountService {
         Account outAcc = getAccByAccCode(request.getOutAccCode());
         Account inAcc = getAccByAccCode(request.getInAccCode());
 
-        // 타입이 적금 또는 예금이면서 만료일 이전일 경우 예외 발생
-        if (isRestrictedAccount(outAcc)) {
-            throw new CustomException(ACCOUNT_NOT_MATURED);
-        }
-
-        // 최소 최대 납입 확인
-        validateProductAmount(inAcc.getProduct().getProdCode(), request.getAmount());
-
-        // 사용자 인증 예외처리
-        authenticateUser(user, outAcc.getUser());
-
-        // 해지된 계좌 예외처리
-        checkAccStatus(inAcc);
-
-        // 유효하지 않은 이체 금액 예외처리
-        if (request.getAmount() < 0) {
-            throw new CustomException(INVALID_TRANSFER_AMOUNT);
-        }
-
-        // 이체한도 예외처리
-        if (outAcc.getAccTrsfLimit() < request.getAmount() || trsfLimitService.checkTrsfLimit(user.getUserCode(), request.getAmount())) {
-            throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
-        }
-        // 최대납입 금액 처리.
-        validatePostTransferAmount(inAcc, request.getAmount());
+        // 예외 처리
+        exceptionHandling(user, outAcc, inAcc, request.getAmount());
 
         // 트랜잭션 시작
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
@@ -163,6 +140,33 @@ public class AccountService {
         }
 
         return ApiResponse.success(USER_ASSETS_CHECK_SUCCESS, new AccountResponseDto.GetAssets(user.getUserNameKr(), assets));
+    }
+
+    private void exceptionHandling(User user, Account outAcc, Account inAcc, Long amount) {
+        // 타입이 적금 또는 예금이면서 만료일 이전일 경우 예외처리
+        if (isRestrictedAccount(outAcc)) {
+            throw new CustomException(ACCOUNT_NOT_MATURED);
+        }
+
+        // 최소 최대 납입 예외처리
+        validateProductAmount(inAcc.getProduct().getProdCode(), amount);
+        validatePostTransferAmount(inAcc, amount);
+
+        // 사용자 인증 예외처리
+        authenticateUser(user, outAcc.getUser());
+
+        // 해지된 계좌 예외처리
+        checkAccStatus(inAcc);
+
+        // 유효하지 않은 이체 금액 예외처리
+        if (amount < 0) {
+            throw new CustomException(INVALID_TRANSFER_AMOUNT);
+        }
+
+        // 이체한도 예외처리
+        if (outAcc.getAccTrsfLimit() < amount || trsfLimitService.checkTrsfLimit(user.getUserCode(), amount)) {
+            throw new CustomException(TRANSFER_LIMIT_EXCEEDED);
+        }
     }
 
     private void bizLogic(Account outAcc, Account inAcc, Long money) {
